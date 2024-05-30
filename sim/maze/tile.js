@@ -109,6 +109,10 @@ class Tile {
         return { x: this.x * 8 + 4, y: this.y * 8 + 4 };
     }
 
+    equals(that) {
+        return this.x == that.x && this.y == that.y;
+    }
+
     draw(ctx, scale) {
         //   ctx.fillStyle = '#222222';
         //   ctx.fillRect(this.x * 8 * scale, this.y * 8 * scale, 8 * scale, 8 * scale);
@@ -161,33 +165,33 @@ class Tile {
 
     blockAllExcept(move) {
         const blockedMoves = [];
-        for (const move2 of MOVE) {
+        for (const move2 of MOVES) {
             if (move2 !== move) {
                 if (this.block(move2)) {
                     blockedMoves.push(move2);
                 }
             }
-        };
+        }
         return blockedMoves;
     }
 
     blockAllMoves() {
-        for (const move of MOVE) {
+        for (const move of MOVES) {
             this.block(move);
-        };
+        }
     }
 
     unblockAllMoves() {
-        for (const move of MOVE) {
+        for (const move of MOVES) {
             this.unblock(move);
-        };
+        }
     }
 
     unblockAll(blockedMoves) {
         if (blockedMoves) {
-            blockedMoves.forEach(move => {
+            for (const move of MOVES) {
                 this.unblock(move);
-            });
+            }
         }
     }
 }

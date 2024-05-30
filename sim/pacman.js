@@ -15,7 +15,7 @@ class Pacman {
     this.nextMove = MOVE.LEFT;
     this.frame = 0;
     this.pauseFrames = 0;
-    this.target = new Point(1,1);
+    this.target = new Point(0,9);
     this.alive = false;
 	}
 	
@@ -40,7 +40,7 @@ class Pacman {
 				const tpx = this.pixel.x % 8;
 				const tpy = this.pixel.y % 8;
 	
-				const delta = this.move.delta;
+				const delta = this.move.delta.copy();
 				
 				switch(this.move) {
 					case MOVE.UP:
@@ -66,14 +66,11 @@ class Pacman {
 				}
 				const newTile = new Point(this.pixel.x/8, this.pixel.y/8);
 				if(!newTile.equals(this.tile)) {
-					console.log("New tile");
 					this.tile = newTile;
 					let moves = game.maze.getAvailableMoves(newTile);
-					moves = moves.filter((m) => m.ordinal !== this.move.ordinal);
-					// this.setNextMove(MOVE.LEFT);
+					moves = moves.filter((m) => m.ordinal !== this.move.opposite.ordinal);
 					if(!this.tile.equals(this.target)) {
-						console.log(game.getMaze().getMoveTowards(this.tile, this.target));
-						this.setCurrentMove(game.getMaze().getMoveTowards(this.tile, this.target));
+						this.setCurrentMove(game.getMaze().getMoveTowards2(this.tile, this.target, moves));
 					}
 				}
 			}
@@ -111,6 +108,7 @@ class Pacman {
 	}
 
 	setCurrentMove(move) {
+		// console.log("Set current move:", move);
 		this.move = move;
 		this.setNextMove(move);
 	}

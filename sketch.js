@@ -6,6 +6,7 @@ function preload() {
 }
 
 function setup() {
+  frameRate(30);
   createCanvas(800, 800);
   this.game = new Game();
   this.game.maze.init();

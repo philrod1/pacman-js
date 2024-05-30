@@ -1,3 +1,7 @@
+
+const WIDTH = 32;
+const HEIGHT = 32;
+
 class Point {
   constructor(x, y) {
     this.x = Math.floor(x);
@@ -15,6 +19,12 @@ class Point {
   equals(that) {
     return this.x == that.x && this.y == that.y;
   }
+  toString() {
+    return `(${this.x}, ${this.y})`;
+  }
+  copy() {
+    return new Point(this.x, this.y);
+  }
 }
 
 /**
@@ -28,6 +38,8 @@ const MOVE = Object.freeze({
   LEFT:  { name: "LEFT",  get opposite() { return MOVE.RIGHT }, delta: new Point(-1,  0), ordinal: 2 },
   RIGHT: { name: "RIGHT", get opposite() { return MOVE.LEFT  }, delta: new Point( 1,  0), ordinal: 3 }
 });
+
+const MOVES = [MOVE.UP, MOVE.DOWN, MOVE.LEFT, MOVE.RIGHT];
 
 const MOVE_BY_ORDINAL = Object.keys(MOVE).reduce((arr, key) => {
   arr[MOVE[key].ordinal] = MOVE[key];
@@ -236,8 +248,6 @@ const pillPositions = [
 ];
 
 function floydWarshall(maze) {
-  const WIDTH = 32;
-  const HEIGHT = 32;
   const max = 10000;
   const n = WIDTH * HEIGHT;
   let dist = Array.from(Array(n), () => new Array(n).fill(max));
@@ -400,24 +410,24 @@ class PriorityQueue {
   }
 }
 
-function pathDistancePoint(point1, point2, dist) {
-  return dist[point1.x * HEIGHT + point1.y][point2.x * HEIGHT + point2.y];
+function pathDistancePoint(point1, point2, mazeID) {
+  return dist[mazeID][point1.x * HEIGHT + point1.y][point2.x * HEIGHT + point2.y];
 }
 
-function pathDistanceTile(tile1, tile2, dist) {
-  return pathDistancePoint(tile1.getPosition(), tile2.getPosition(), dist);
+function pathDistanceTile(tile1, tile2, mazeID) {
+  return pathDistancePoint(tile1.getPosition(), tile2.getPosition(), mazeID);
 }
 
-function aStarDistance(node, node2, dist) {
+function aStarDistance(tile1, tile2, mazeID) {
   const agenda = new PriorityQueue((a, b) => a.f - b.f);
   const visited = new Set();
 
-  if (node !== null && node2 !== null) {
-      agenda.enqueue(new TileDistance(node, 0, 0, null));
+  if (tile1 !== null && tile2 !== null) {
+      agenda.enqueue(new TileDistance(tile1, 0, 0, null));
   }
   while (!agenda.isEmpty()) {
-      const current = agenda.dequeue();
-      if (current.node.equals(node2)) {
+      let current = agenda.dequeue();
+      if (current.tile.equals(tile2)) {
           let count = 0;
           while (current.parent !== null) {
               current = current.parent;
@@ -425,9 +435,9 @@ function aStarDistance(node, node2, dist) {
           }
           return count;
       }
-      for (const neighbour of current.node.getNeighbours()) {
-          if (neighbour !== null) {
-              const d = pathDistanceTile(node2, neighbour, dist);
+      for (const neighbour of current.tile.getNeighbours()) {
+          if (neighbour) {
+              const d = pathDistanceTile(tile2, neighbour, mazeID);
               if (d >= 0 && !visited.has(neighbour)) {
                   const nd = new TileDistance(neighbour, current.g + 1, d, current);
                   agenda.enqueue(nd);
@@ -438,3 +448,67 @@ function aStarDistance(node, node2, dist) {
   }
   return -1;
 }
+
+function calculateDistances(graph, mazeID) {
+  const distances = new Map();
+  for (let x = 0; x < WIDTH; x++) {
+    for (let y = 0; y < HEIGHT; y++) {
+      const tile1 = graph[x][y];
+      if (tile1) {
+        distances[tile1.x * HEIGHT + tile1.y] = {};
+        for (let x2 = 0; x2 < WIDTH; x2++) {
+          for (let y2 = 0; y2 < HEIGHT; y2++) {
+            const tile2 = graph[x2][y2];
+            if (tile2) {
+              let d = 100000;
+              let dir = null;
+              for (let move of tile1.getAvailableMoves()) {
+                tile1.blockAllExcept(move);
+                const asd = aStarDistance(tile1, tile2, mazeID);
+                tile1.unblockAllMoves();
+                if (asd >= 0 && asd < d) {
+                  d = asd;
+                  dir = move;
+                }
+              }
+              if (dir) {
+                distances[tile1.x * HEIGHT + tile1.y][tile2.x * HEIGHT + tile2.y] = { "move": dir, "distance": d};
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  return distances;
+}
+
+function calculateMoveDistances(graph, mazeID) {
+  const distances = {};
+  for (let x = 0; x < WIDTH; x++) {
+    for (let y = 0; y < HEIGHT; y++) {
+      const node = graph[x][y];
+      if (node) {
+        const mapForNode = {};
+        distances[x * HEIGHT + y] = mapForNode;
+        for (let x2 = 0; x2 < WIDTH; x2++) {
+          for (let y2 = 0; y2 < HEIGHT; y2++) {
+            const node2 = graph[x2][y2];
+            if (node2) {
+              const d = [10000, 10000, 10000, 10000]; // Assuming there are 4 possible moves.
+              for (let move of node.getAvailableMoves()) {
+                node.blockAllExcept(move);
+                d[move.ordinal] = aStarDistance(node, node2, mazeID);
+                node.unblockAllMoves();
+              }
+              const tile2 = node2.getPosition();
+              mapForNode[tile2.x * HEIGHT + tile2.y] = d;
+            }
+          }
+        }
+      }
+    }
+  }
+  return distances;
+}
+

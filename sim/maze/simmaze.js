@@ -14,15 +14,28 @@ class SimMaze {
     this.mazeLists = [[],[],[],[]];
     this.mazeID = 0;
     this.pillCount = 0;
-    this.distances = [[],[],[],[]];
     this.currentMaze = this.mazes[0];
   }
 
   init() {
     this.buildGraphs();
-    for (let i = 0 ; i < 4 ; i++) {
-      this.distances[i] = floydWarshall(this.mazes[i]);
-    }
+    // const dists = {0:{}, 1:{}, 2:{}, 3:{}};
+    // for (let m = 0 ; m < 4 ; m++) {
+    //   this.distances[m] = floydWarshall(this.mazes[m]);
+    //   for (let i = 0 ; i < 1024 ; i++) {
+    //     for (let j = 0 ; j < 1024 ; j++) {
+    //       if (this.distances[m][i][j] >= 0) {
+    //         if (!dists[m][i]) {
+    //           dists[m][i] = {};
+    //         }
+    //         dists[m][i][j] = this.distances[m][i][j];
+    //       }
+    //     }
+    //   }
+    // }
+    this.distances = calculateMoveDistances(this.mazes[0], 0);
+    // console.log(this.distances);
+    // console.log(JSON.stringify(distances));
     this.currentMaze = this.mazes[0];
   }
 
@@ -213,9 +226,33 @@ class SimMaze {
 		// return maze.getNextDecisionPoint(point, currentMove);
 	}
 
-  //TODO: Make not random
   getMoveTowards(tile, target) {
-    return MOVE_BY_ORDINAL[Math.floor(Math.random() * 4)];
+    try {
+			return this.distances[tile.x * HEIGHT + tile.y][target.x * HEIGHT + target.y].move;
+		} catch (e) {
+			console.log("Null pointer exception (" + tile + " and " + target + ") in maze");
+			console.log(e);
+			return null;
+		}
+  }
+
+  getMoveTowards2(tile, target, moves) {
+    let d = 100000;
+    let m = null;
+    try {
+			const moveDistances = this.distances[tile.x * HEIGHT + tile.y][target.x * HEIGHT + target.y];
+      for (const move of moves) {
+        if (moveDistances[move.ordinal] < d) {
+          m = move;
+          d = moveDistances[move.ordinal];
+        }
+      }
+		} catch (e) {
+			console.log("Null pointer exception (" + tile + " and " + target + ") in maze");
+			console.log(e);
+			return null;
+		}
+    return m;
   }
 
   getNextTile(point, move) {
