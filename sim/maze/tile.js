@@ -130,7 +130,7 @@ class Tile {
         if (this.value === 2) {
             ctx.fillStyle = 'white';
             ctx.beginPath();
-            ctx.arc(this.getCentrePoint().x * scale, this.getCentrePoint().y * scale, 2 * scale, 0, 2 * Math.PI);
+            ctx.arc(this.getCentrePoint().x * scale, this.getCentrePoint().y * scale, 3 * scale, 0, 3 * Math.PI);
             ctx.fill();
         }
     }

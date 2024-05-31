@@ -1,12 +1,33 @@
 
 class Ghost {
+
+	// static ghostHome = [
+	// 	new Point(15,13),
+	// 	new Point(16,13),
+	// 	new Point(13,14),
+	// 	new Point(14,14),
+	// 	new Point(15,14),
+	// 	new Point(16,14),
+	// 	new Point(17,14),
+	// 	new Point(18,14),
+	// 	new Point(13,15),
+	// 	new Point(14,15),
+	// 	new Point(15,15),
+	// 	new Point(16,15),
+	// 	new Point(17,15),
+	// 	new Point(18,15),
+	// 	new Point(13,16),
+	// 	new Point(14,16),
+	// 	new Point(15,16),
+	// 	new Point(16,16),
+	// 	new Point(17,16),
+	// 	new Point(18,16)
+	// ];
 	
   constructor() {
+		this.sprites = loadImage('res/ghost_sprites.png');
     this.currentOrientation = MOVE.LEFT;
     this.previousOrientation = MOVE.LEFT;
-    // this.target = undefined;
-    // this.pixel = undefined;
-    // this.tile = undefined;
     this.cruiseLevel = 0;
     this.frightened = false;
     this.frame = 0;
@@ -21,34 +42,6 @@ class Ghost {
 		this.homeLeft = 111;
 		this.homeRight = 143;
     this.reverse = false;
-    // this.startPosition;
-    // this.homeNextState;
-    // this.homeNextMove;
-    // this.leaveHomeMove;
-    // this.chompPause;
-    // this.gid;
-    this.ghostHome = [
-      new Point(15,13),
-      new Point(16,13),
-      new Point(13,14),
-      new Point(14,14),
-      new Point(15,14),
-      new Point(16,14),
-      new Point(17,14),
-      new Point(18,14),
-      new Point(13,15),
-      new Point(14,15),
-      new Point(15,15),
-      new Point(16,15),
-      new Point(17,15),
-      new Point(18,15),
-      new Point(13,16),
-      new Point(14,16),
-      new Point(15,16),
-      new Point(16,16),
-      new Point(17,16),
-      new Point(18,16)
-    ];
     this.currentPatterns = [
 			0b10101010101010010101010101010100, // Normal
 			0b00100100100100100010010010010010, // Scared
@@ -82,9 +75,6 @@ class Ghost {
 		}
 		
 		let steps = this.getSteps();
-
-		// if (this instanceof Sue)
-		// 	console.log(steps);
 		
 		for(let step = 0 ; step < steps ; step++) {
 			
@@ -113,19 +103,19 @@ class Ghost {
 				if(this.reverse) {
 					this.reverse = false;
 				}
-				if(this.pixel.equals(door)) {
+				if(this.pixel.equals(this.door)) {
 					this.state = 1;
-					this.target = home;
+					this.target = this.home;
 					return MOVE.DOWN;
 				} else {
 					this.target = this.door;
 				}
 				
 				if(this.tileChanged) {
-						moves = game.maze.getAvailableMoves(tile);
+						moves = game.maze.getAvailableMoves(this.tile);
 						moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
-						if (moves.size() == 1) {
-							this.currentOrientation = moves.get(0);
+						if (moves.length == 1) {
+							this.currentOrientation = moves[0];
 						} else {
 							this.currentOrientation = this.calculateMove(game, moves, this.tile, new Point(this.door.x/8,this.door.y/8));
 						}
@@ -140,7 +130,7 @@ class Ghost {
 				 if(this.pixel.y >= this.home.y) {
 					this.state = this.homeNextState;
 					this.frightened = false;
-					this.target = new Point(this.startPosition,x, this.startPosition.y);
+					this.target = new Point(this.startPosition.x, this.startPosition.y);
 					this.currentOrientation = this.homeNextMove;
 					return this.homeNextMove;
 				} else {
@@ -190,37 +180,24 @@ class Ghost {
 						return this.previousOrientation;
 					}
 					if (this.frightened) {
-						moves = moves.filter((m) => m.ordinal !== this.previousOrientation.ordinal);
+						moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
 						this.currentOrientation = moves[nextInt(moves.length)];
 					} else {
 						moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
 						const nextTile = game.maze.getNextTile(this.tile, this.currentOrientation);
-						// console.log("Next tile:", nextTile);
 						if(this.isDecisionPoint(this.pixel, nextTile, game.maze)) {
-							// console.log("Make decision");
 							this.target = this.getTarget(game);
-							// console.log("Target =", this.target);
 							moves = game.maze.getAvailableMoves(nextTile);
-							// console.log("Moves before filter:", moves);
 							moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
-							// console.log("Moves after filter:", moves);
 							if(game.areGhostsRandom()) {
-								// console.log("Ghosts are random.");
 								let i = nextInt(moves.length);
-								// console.log("Index =", i);
 								this.currentOrientation = moves[i];
-								// console.log("Current orientation:", this.currentOrientation);
 							} else {
-								// console.log("Ghosts are NOT random.");
 								this.currentOrientation = this.calculateMove(game, moves, nextTile, this.target);
-								// console.log("Current orientation:", this.currentOrientation);
 							}
 						}
 					}
-					// console.log(this.isTileCentre(this.pixel), game.maze.isDecisionTile(this.tile))
 					if(this.isTileCentre(this.pixel) && game.maze.isDecisionTile(this.tile)) {
-						// console.log("TILE CENTRE")
-						// console.log(this.currentOrientation);
 						this.previousOrientation = this.currentOrientation;
 					}
 				}
@@ -274,6 +251,7 @@ class Ghost {
 	getTarget(game) {};
 	
 	setFrightened(frightened) {
+		this.reverse = true;
 		this.frightened = frightened;
 		this.tileChanged = true;
 	}
@@ -282,7 +260,7 @@ class Ghost {
 		return this.tile;
 	}
 	
-	reverse() {
+	triggerReverse() {
 		reverse = true;
 	}
 	
@@ -464,7 +442,22 @@ class Ghost {
 	}
 
 	draw(ctx, scale) {
-		ctx.fillStyle = this.color;
-    ctx.fillRect(this.pixel.x * scale - (4 * scale), this.pixel.y * scale - (4 * scale),(8 * scale), (8 * scale));
+		let sxOffset = this.currentOrientation.ordinal * 32;
+		let frame = Math.floor(this.frame/8) * 16;
+		if (this.frightened) {
+			sxOffset = 128;
+		} else if (this.state == 0) {
+			sxOffset = 192 + this.currentOrientation.ordinal * 16;
+			frame = 0;
+		}
+		const dx = this.pixel.x * scale - 8 * scale;
+		const dy = this.pixel.y * scale - 8 * scale;
+		const dw = 16 * scale;
+		const dh = 16 * scale;
+		const sx = sxOffset + frame; // Which sprite?
+		const sy = this.gid * 16; // Which ghost?
+		const sw = 16;
+		const sh = 16;
+		image(this.sprites, dx, dy, dw, dh, sx, sy, sw, sh);
 	}
 }

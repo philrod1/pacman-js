@@ -6,8 +6,8 @@ class Inky extends Ghost {
 		this.gid = 2;
 		this.homeNextState = 2;
 		this.homeNextMove = MOVE.LEFT;
-		this.startPosition = new Point(111, 124);
-		this.pixel = new Point(111, 124);
+		this.startPosition = new Point(112, 124);
+		this.pixel = new Point(112, 124);
 		this.tile = new Point(this.pixel.x/8, this.pixel.y/8);
 		this.previousOrientation = MOVE.UP;
 		this.currentOrientation = MOVE.UP;

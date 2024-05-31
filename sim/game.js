@@ -1,5 +1,6 @@
 class Game {
   constructor() {
+    this.numbers = loadImage('res/numbers.png');
       this.framesEnergised = [0, 360, 300, 240, 180, 120, 300, 120, 120, 60, 300, 120, 60, 60, 180, 60, 60, 0, 60];
       this.collisionsEnabled = true;
 
@@ -25,19 +26,22 @@ class Game {
 
   step() {
       if (this.ghostEatenPauseFramesRemaining > 0) {
-          this.ghosts.forEach(ghost => {
-              if (ghost.getState() === 0) {
-                  ghost.update(this);
-              }
-          });
-          this.ghostEatenPauseFramesRemaining--;
-          return true;
+        for (let ghost of this.ghosts) {
+            if (ghost.getState() === 0) {
+                ghost.update(this);
+            }
+        }
+        this.ghostEatenPauseFramesRemaining--;
+        return true;
       }
 
       if (this.energiserPauseFramesRemaining > 0) {
-          this.ghosts.forEach(ghost => ghost.update(this));
-          this.energiserPauseFramesRemaining--;
-          return true;
+        // for (let ghost of this.ghosts) {
+        //     ghost.update(this);
+        // }
+        this.ghosts.map(ghost => ghost.update(this));
+        this.energiserPauseFramesRemaining--;
+        return true;
       }
 
       this.ghostManager.update(this.level);
@@ -46,24 +50,26 @@ class Game {
           this.energisedFramesRemaining--;
           if (this.energisedFramesRemaining <= 1) {
               this.pacman.setEnergised(false);
-              this.ghosts.forEach(ghost => ghost.setFrightened(false));
+              for (let ghost of this.ghosts) {
+                ghost.setFrightened(false);
+              }
           }
       }
 
       this.pacman.update(this);
 
-    //   if (this.checkGhostCollision()) {
-    //       return false;
-    //   }
+      if (this.checkGhostCollision()) {
+          return false;
+      }
 
-      this.ghosts.forEach(ghost => {
+      for (let ghost of this.ghosts) {
           if (this.maze.isSlow(ghost.getTile())) {
               ghost.setSlow(true);
           } else {
               ghost.setSlow(false);
           }
           ghost.update(this);
-      });
+      }
 
       if (this.checkGhostCollision()) {
           return false;
@@ -80,8 +86,7 @@ class Game {
           this.pacman.setEnergised(true);
           this.energisedFramesRemaining = this.getEnergisedFramesRemaining();
           this.energiserPauseFramesRemaining = 3;
-          this.ghosts.forEach(ghost => {
-              ghost.reverse();
+          this.ghosts.map( ghost => {
               ghost.setFrightened(true);
           });
           this.ghostManager.pillEaten();
@@ -89,7 +94,9 @@ class Game {
       }
 
       this.pacman.incFrame();
-      this.ghosts.forEach(ghost => ghost.incFrame());
+      for (let ghost of this.ghosts) {
+        ghost.incFrame();
+      }
 
       return true;
   }
@@ -102,6 +109,7 @@ class Game {
   }
 
   checkGhostCollision() {
+    // return false;
       for (let ghost of this.ghosts) {
           if (ghost.getTile().equals(this.pacman.tile)) {
               if (ghost.getState() === 4) {
@@ -244,6 +252,28 @@ class Game {
         this.ghosts[i].draw(ctx, scale);
     }
     this.pacman.draw(ctx, scale);
+  }
+
+  drawScore(ctx, scale) {
+    let s = this.score;
+    let digits = [];
+    while (s > 0) {
+        digits.push(s % 10);
+        s = Math.floor(s / 10);
+    }
+    const xPos = 9 * scale * 8;
+    const yPos = 1 * scale * 9;
+    const dy = yPos;
+    const dw = 8 * scale;
+    const dh = 8 * scale;
+    const sy = 0;
+    const sw = 8;
+    const sh = 8;
+    for (let i = 0 ; i < digits.length ; i++) {
+        const dx = xPos - i * 8 * scale;
+		const sx = digits[i] * 8; // Which digit?
+		image(this.numbers, dx, dy, dw, dh, sx, sy, sw, sh);
+    }
   }
 
 }

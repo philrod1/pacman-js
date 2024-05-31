@@ -6,8 +6,8 @@ class Pinky extends Ghost {
 		this.gid = 1;
 		this.homeNextState = 3;
 		this.homeNextMove = MOVE.UP;
-		this.startPosition = new Point(127, 124);
-		this.pixel = new Point(127, 124);
+		this.startPosition = new Point(128, 124);
+		this.pixel = new Point(128, 124);
 		this.tile = new Point(this.pixel.x/8, this.pixel.y/8);
 		this.previousOrientation = MOVE.UP;
 		this.currentOrientation = MOVE.UP;

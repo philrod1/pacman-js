@@ -2,7 +2,7 @@ class SimMaze {
   static WIDTH = 32;
   static HEIGHT = 32;
   static slowTiles = [
-    new Set([1, 3, 4, 27, 28, 29].flatMap(x => [9, 18].map(y => new Point(x, y)))),
+    new Set([2, 3, 4, 27, 28, 29].flatMap(x => [9, 18].map(y => new Point(x, y)))),
     new Set([...Array.from({ length: 7 }, (_, i) => new Point(2 + i, 2)),
     ...Array.from({ length: 7 }, (_, i) => new Point(23 + i, 2)),
     ...Array.from({ length: 3 }, (_, i) => new Point(2 + i, 24)),
@@ -15,6 +15,7 @@ class SimMaze {
     this.mazeID = 0;
     this.pillCount = 0;
     this.currentMaze = this.mazes[0];
+    console.log(SimMaze.slowTiles);
   }
 
   init() {
@@ -150,7 +151,7 @@ class SimMaze {
 			let tile = this.currentMaze[point.x][point.y];
 			return tile.getAvailableMoves();
 		} catch (e) {
-      console.log(e);
+      // console.log(e);
 			return null;
 		}
 	}
@@ -175,7 +176,7 @@ class SimMaze {
     let tile = this.currentMaze[Math.floor(pixel.x / 8)][Math.floor(pixel.y / 8)];
     if (tile == null) return false;
     let moves = tile.getAvailableMoves();
-    if (moves.includes(move)) {
+    if (moves.some( m => m.ordinal == move.ordinal )) {
       return true;
     }
     switch (move) {
@@ -193,7 +194,16 @@ class SimMaze {
   }
 
   isSlow(tile) {
-		return this.mazeID < 2 ? SimMaze.slowTiles[this.mazeID].has(tile) : false;
+    if (this.mazeID > 1) {
+      return false;
+    }
+    const slowTiles = SimMaze.slowTiles[this.mazeID];
+    for (const slowTile of slowTiles) {
+      if (slowTile.equals(tile)) {
+        return true;
+      }
+    }
+		return false;
 	}
 
   getPills() {
@@ -252,6 +262,7 @@ class SimMaze {
 			console.log(e);
 			return null;
 		}
+    console.log(moves, m);
     return m;
   }
 

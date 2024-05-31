@@ -1,6 +1,7 @@
 class Pacman {
 	
 	constructor() {
+		this.sprites = loadImage('res/ms_pacman_sprites.png');
     this.stepPatterns = [
 			0b10101010101010101010101010101010,
 			0b11010101011010101101010101101010
@@ -8,8 +9,6 @@ class Pacman {
 		this.color = "YELLOW";
     this.pixel = new Point(127,196);
     this.tile = new Point(15,24);
-    // this.pixel = new Point(12,19);
-    // this.tile = new Point(4,4);
     this.isEnergised = false;
     this.move = MOVE.LEFT;
     this.nextMove = MOVE.LEFT;
@@ -25,7 +24,7 @@ class Pacman {
 		if(this.isLegal(this.nextMove, game)) {
 			this.setCurrentMove(this.nextMove);
 		} else {
-			return;
+			// return;
 		}
 		
 		if(this.pauseFrames > 0) {
@@ -37,11 +36,10 @@ class Pacman {
 			
 			if(this.isLegal(this.move, game)) {
 	
+				// This allows diagonal movement when cornering
 				const tpx = this.pixel.x % 8;
 				const tpy = this.pixel.y % 8;
-	
 				const delta = this.move.delta.copy();
-				
 				switch(this.move) {
 					case MOVE.UP:
 					case MOVE.DOWN:
@@ -58,6 +56,7 @@ class Pacman {
 							delta.translate(0, -1);
 						}
 				}
+				// Do the move, wrapping if needed
 				this.pixel.translate(delta.x, delta.y);
 				if(this.pixel.x < 0) {
 					this.pixel.x = 255;
@@ -67,11 +66,11 @@ class Pacman {
 				const newTile = new Point(this.pixel.x/8, this.pixel.y/8);
 				if(!newTile.equals(this.tile)) {
 					this.tile = newTile;
-					let moves = game.maze.getAvailableMoves(newTile);
-					moves = moves.filter((m) => m.ordinal !== this.move.opposite.ordinal);
-					if(!this.tile.equals(this.target)) {
-						this.setCurrentMove(game.getMaze().getMoveTowards2(this.tile, this.target, moves));
-					}
+				// 	let moves = game.maze.getAvailableMoves(newTile);
+				// 	moves = moves.filter((m) => m.ordinal !== this.move.opposite.ordinal);
+				// 	if(!this.tile.equals(this.target)) {
+				// 		this.setCurrentMove(game.getMaze().getMoveTowards2(this.tile, this.target, moves));
+				// 	}
 				}
 			}
 		}
@@ -113,16 +112,6 @@ class Pacman {
 		this.setNextMove(move);
 	}
 	
-	// setCurrentMove(pacmanOrientation) {
-	// 	switch (pacmanOrientation.ordinal) {
-	// 	case 0: this.setCurrentMove(MOVE.RIGHT); break;
-	// 	case 1: this.setCurrentMove(MOVE.DOWN);  break;
-	// 	case 2: this.setCurrentMove(MOVE.LEFT);  break;
-	// 	case 3: this.setCurrentMove(MOVE.UP);    break;
-	// 	default: console.log("Pac-Man orientaion is " + pacmanOrientation + "!?");
-	// 	}
-	// }
-	
 	setNextMove(move) {
 		this.nextMove = move;
 	}
@@ -157,12 +146,12 @@ class Pacman {
 
 	setTarget(target, game) {
 		this.target = target;
-		move = game.getMaze().getMoveTowards(this.tile, this.target);
-		if(move == null) {
-			move = MOVE.LEFT;
-			this.target = new Point(14, 24);
-		}
-		this.setCurrentMove(move);
+		// this.move = game.getMaze().getMoveTowards(this.tile, this.target);
+		// if(this.move == null) {
+		// 	this.move = MOVE.LEFT;
+		// 	this.target = new Point(14, 24);
+		// }
+		// this.setCurrentMove(move);
 	}
 
 	getTarget() {
@@ -178,7 +167,14 @@ class Pacman {
 	}
 
 	draw(ctx, scale) {
-		ctx.fillStyle = this.color;
-    ctx.fillRect(this.pixel.x * scale - 8, this.pixel.y * scale - (4*scale), 8*scale, 8*scale);
+		const dx = this.pixel.x * scale - 8 * scale;
+		const dy = this.pixel.y * scale - 8 * scale;
+		const dw = 16 * scale;
+		const dh = 16 * scale;
+		const sx = Math.floor(this.frame/4) * 16; // Which frame?
+		const sy = this.move.ordinal * 16; // Which direction?
+		const sw = 16;
+		const sh = 16;
+		image(this.sprites, dx, dy, dw, dh, sx, sy, sw, sh);
 	}
 }
