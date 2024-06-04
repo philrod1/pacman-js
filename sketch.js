@@ -11,13 +11,28 @@ function setup() {
   this.gfxScale = 2;
   frameRate(60);
   createCanvas(420 * this.gfxScale, 387*this.gfxScale);
-  this.game = new Game();
+  this.game = new Game(this.gfxScale);
   this.game.maze.init();
+}
+
+function incScale() {
+  this.setScale(this.gfxScale + 0.1);
+}
+
+function decScale() {
+  this.setScale(this.gfxScale - 0.1);
+}
+
+function setScale(scale) {
+  this.gfxScale = scale;
+  this.game.setScale(scale);
+  resizeCanvas(420 * this.gfxScale, 387*this.gfxScale);
 }
 
 let running = true;
 
 function keyPressed(event) {
+  // console.log(event.keyCode);
   switch (event.keyCode) {
     case 32:
       running = !running;
@@ -27,18 +42,24 @@ function keyPressed(event) {
         noLoop();
       }
       break;
-      case 37:
-        game.pacman.setNextMove(MOVE.LEFT);
-        break;
-      case 38:
-        game.pacman.setNextMove(MOVE.UP);
-        break;
-      case 39:
-        game.pacman.setNextMove(MOVE.RIGHT);
-        break;
-      case 40:
-        game.pacman.setNextMove(MOVE.DOWN);
-        break;
+    case 37:
+      game.pacman.setNextMove(MOVE.LEFT);
+      break;
+    case 38:
+      game.pacman.setNextMove(MOVE.UP);
+      break;
+    case 39:
+      game.pacman.setNextMove(MOVE.RIGHT);
+      break;
+    case 40:
+      game.pacman.setNextMove(MOVE.DOWN);
+      break;
+    case 187:
+      this.incScale();
+      break;
+    case 189:
+      this.decScale();
+      break;
   }
 }
 
@@ -53,7 +74,5 @@ function draw() {
   this.game.draw(this.drawingContext, this.gfxScale);
   this.game.step();
   translate(-tx * this.gfxScale, -ty * this.gfxScale);
-  translate(54 * this.gfxScale, 50 * this.gfxScale);
-  this.game.drawScore(this.drawingContext, this.gfxScale);
-  image(decal, -54 * this.gfxScale, -50 * this.gfxScale, decal.width * this.gfxScale / 2, decal.height * this.gfxScale / 2);
+  image(decal, -3 + this.gfxScale, -1 * this.gfxScale, decal.width * this.gfxScale / 2, decal.height * this.gfxScale / 2);
 }

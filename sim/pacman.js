@@ -15,7 +15,19 @@ class Pacman {
     this.frame = 0;
     this.pauseFrames = 0;
     this.target = new Point(0,9);
-    this.alive = false;
+    this.alive = true;
+	}
+
+	reset() {
+		this.pixel = new Point(127,196);
+    this.tile = new Point(15,24);
+    this.isEnergised = false;
+    this.move = MOVE.LEFT;
+    this.nextMove = MOVE.LEFT;
+    this.frame = 0;
+    this.pauseFrames = 0;
+    this.target = new Point(0,9);
+    this.alive = true;
 	}
 	
 	update(game) {

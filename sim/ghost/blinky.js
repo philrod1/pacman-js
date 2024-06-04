@@ -16,6 +16,17 @@ class Blinky extends Ghost {
 
 	// update(game) {}
 
+	reset() {
+		this.homeNextState = 5;
+		this.homeNextMove = MOVE.UP;
+		this.startPosition = new Point(127, 100);
+		this.pixel = new Point(127, 100);
+		this.tile = new Point(this.pixel.x/8, this.pixel.y/8);
+		this.previousOrientation = MOVE.LEFT;
+		this.currentOrientation = MOVE.LEFT;
+		this.state = 4;
+	}
+
 	setCruiseLevel(cruiseLevel) {
 		this.cruiseLevel = cruiseLevel;
 	}

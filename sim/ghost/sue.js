@@ -13,6 +13,17 @@ class Sue extends Ghost {
 		this.currentOrientation = MOVE.UP;
 		this.state = 3;
 	}
+
+	reset() {
+		this.homeNextState = 2;
+		this.homeNextMove = MOVE.RIGHT;
+		this.startPosition = new Point(143, 124);
+		this.pixel = new Point(143, 124);
+		this.tile = new Point(this.pixel.x/8, this.pixel.y/8);
+		this.previousOrientation = MOVE.UP;
+		this.currentOrientation = MOVE.UP;
+		this.state = 3;
+	}
 	
 	leaveHome() {
 		// return

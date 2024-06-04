@@ -7,7 +7,16 @@ class GhostManager {
       this.globalPillCount = 0;
       this.globalPillLimits = [0, 7, 17, 32];
       this.ghostPillCounts = [0, 0, 0, 0];
-      this.random = false;
+      this.random = true;
+      this.randomFrames = 300;
+  }
+
+  pacmanKilled() {
+    this.random = true;
+    this.randomFrames = 300;
+    for (let ghost of this.ghosts) {
+        ghost.reset();
+    }
   }
 
   reset(globalMode, framesSinceLastPillEaten, globalPillCount, ghostPillCounts, random) {
@@ -43,6 +52,12 @@ class GhostManager {
   }
 
   update(level) {
+      if (this.randomFrames <= 0) {
+          this.random = false;
+      } else {
+
+          this.randomFrames--;
+      }
       if (this.globalMode) {
           for (let i = 1; i < 4; i++) {
               if (this.globalPillCount >= this.globalPillLimits[i] && this.ghosts[i].getState() === 3) {
