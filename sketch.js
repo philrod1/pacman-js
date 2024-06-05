@@ -11,8 +11,7 @@ function setup() {
   this.gfxScale = 2;
   frameRate(60);
   createCanvas(420 * this.gfxScale, 387*this.gfxScale);
-  this.game = new Game(this.gfxScale);
-  this.game.maze.init();
+  this.gamemanager = new GameManager(drawingContext, this.gfxScale);
 }
 
 function incScale() {
@@ -25,7 +24,7 @@ function decScale() {
 
 function setScale(scale) {
   this.gfxScale = scale;
-  this.game.setScale(scale);
+  this.gamemanager.game.setScale(scale);
   resizeCanvas(420 * this.gfxScale, 387*this.gfxScale);
 }
 
@@ -43,16 +42,16 @@ function keyPressed(event) {
       }
       break;
     case 37:
-      game.pacman.setNextMove(MOVE.LEFT);
+      gamemanager.game.pacman.setNextMove(MOVE.LEFT);
       break;
     case 38:
-      game.pacman.setNextMove(MOVE.UP);
+      gamemanager.game.pacman.setNextMove(MOVE.UP);
       break;
     case 39:
-      game.pacman.setNextMove(MOVE.RIGHT);
+      gamemanager.game.pacman.setNextMove(MOVE.RIGHT);
       break;
     case 40:
-      game.pacman.setNextMove(MOVE.DOWN);
+      gamemanager.game.pacman.setNextMove(MOVE.DOWN);
       break;
     case 187:
       this.incScale();
@@ -71,8 +70,7 @@ function draw() {
   const tx = 61;
   const ty = 66;
   translate(tx * this.gfxScale, ty * this.gfxScale);
-  this.game.draw(this.drawingContext, this.gfxScale);
-  this.game.step();
+  this.gamemanager.update();
   translate(-tx * this.gfxScale, -ty * this.gfxScale);
   image(decal, -3 + this.gfxScale, -1 * this.gfxScale, decal.width * this.gfxScale / 2, decal.height * this.gfxScale / 2);
 }

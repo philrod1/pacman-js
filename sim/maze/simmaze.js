@@ -15,7 +15,7 @@ class SimMaze {
     this.mazeID = 0;
     this.pillCount = 0;
     this.currentMaze = this.mazes[0];
-    console.log(SimMaze.slowTiles);
+    this.init();
   }
 
   init() {
@@ -37,7 +37,8 @@ class SimMaze {
     this.distances = calculateMoveDistances(this.mazes[0], 0);
     // console.log(this.distances);
     // console.log(JSON.stringify(distances));
-    this.currentMaze = this.mazes[0];
+    // this.currentMaze = this.mazes[0];
+    this.setMaze(0);
   }
 
   sync(data) {
@@ -139,7 +140,7 @@ class SimMaze {
     let tile = this.currentMaze[msPacmanTile.x][msPacmanTile.y];
     if (tile && tile.hasPowerPill()) {
       tile.setHasPowerPill(false);
-      this.pillCount--;
+      // this.pillCount--;
       return true;
     }
     return false;

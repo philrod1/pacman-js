@@ -9,10 +9,8 @@ class Game {
         this.energisedFramesRemaining = 0;
         this.energiserPauseFramesRemaining = 0;
         this.ghostEatenPauseFramesRemaining = 0;
-        this.ghosts = [new Blinky(), new Pinky(), new Inky(), new Sue()];
-        this.ghostManager = new GhostManager(this.ghosts);
         this.level = 1;
-        this.lives = 2;
+        this.lives = 3;
         this.pacman = new Pacman();
         this.maze = new SimMaze();
         this.pacmanOrientations = [MOVE.RIGHT, MOVE.DOWN, MOVE.LEFT, MOVE.UP];
@@ -26,6 +24,11 @@ class Game {
         //   this.level = game.getLevel();
         //   this.maze.setMaze(game.getLevel());
         //   this.score = game.getScore();
+    }
+
+    initGhosts() {
+        this.ghosts = [new Blinky(), new Pinky(), new Inky(), new Sue()];
+        this.ghostManager = new GhostManager(this.ghosts);
     }
 
     setScale(scale) {
@@ -129,12 +132,6 @@ class Game {
                         return false;
                     }
                     this.pacman.setAlive(false);
-                    this.lives--;
-                    if (this.lives == 0) {
-                        noLoop();
-                    }
-                    this.pacman.reset();
-                    this.ghostManager.pacmanKilled();
                     return this.collisionsEnabled;
                 } else {
                     return false;
@@ -262,15 +259,37 @@ class Game {
 
     draw(ctx, scale) {
         this.maze.draw(ctx, scale);
-        for (let i = 0; i < 4; i++) {
-            this.ghosts[i].draw(ctx, scale);
-        }
-        this.pacman.draw(ctx, scale);
+        this.drawAgents(ctx, scale);
         this.drawText("Level " + this.level, 2, 0);
         this.drawText(this.score.toString().padStart(7, ' '), 0, 1);
+        this.drawLives();
     }
 
-    drawText(text, x, y) {
+    drawAgents(ctx, scale) {
+        if (this.ghosts) {
+            for (let i = 0; i < 4; i++) {
+                this.ghosts[i].draw(ctx, scale);
+            }
+            this.pacman.draw(ctx, scale);
+        }
+    }
+
+    drawLives() {
+        const x = 4;
+        const dy = 32 * 8 * this.scale;
+        const dw = 16 * this.scale;
+        const dh = 16 * this.scale;
+        const sy = 0;
+        const sx = 0;
+        const sw = 16;
+        const sh = 16;
+        for (let i = 0 ; i < this.lives ; i++) {
+            const dx = (x * 8 + i * 16) * this.scale;
+            image(this.lifeImg, dx, dy, dw, dh, sx, sy, sw, sh);
+        }
+    }
+
+    drawText(text, x, y, t = [255, 255, 255]) {
         y = y - 2;
         x = x + 2;
         const dy = 8 * this.scale * y;
@@ -279,11 +298,13 @@ class Game {
         const sy = 0;
         const sw = 8;
         const sh = 8;
+        tint(t);
         for (let i = 0 ; i < text.length ; i++) {
             const dx = (x + i) * 8 * this.scale;
             const sx = (text.charCodeAt(i) - 32) * 8;
             image(this.font, dx, dy, dw, dh, sx, sy, sw, sh);
         }
+        noTint();
     }
 
 }

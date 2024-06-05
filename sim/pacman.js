@@ -178,6 +178,17 @@ class Pacman {
 		return this.alive;
 	}
 
+	rotate() {
+		let next = 0;
+		switch (this.move.ordinal) {
+			case 0: next = 3; break;
+			case 1: next = 2; break;
+			case 2: next = 0; break;
+			case 3: next = 1; break;
+		}
+		this.setCurrentMove(MOVE_BY_ORDINAL[next]);
+	}
+
 	draw(ctx, scale) {
 		const dx = this.pixel.x * scale - 8 * scale;
 		const dy = this.pixel.y * scale - 8 * scale;
