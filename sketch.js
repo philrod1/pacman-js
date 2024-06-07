@@ -3,7 +3,6 @@ let decal;
 
 // Load the image.
 function preload() {
-  maze_bg = loadImage('res/maze1.png');
   decal = loadImage('res/decal.png');
 }
 
@@ -42,16 +41,42 @@ function keyPressed(event) {
       }
       break;
     case 37:
-      gamemanager.game.pacman.setNextMove(MOVE.LEFT);
+      this.gamemanager.game.pacman.setNextMove(MOVE.LEFT);
       break;
     case 38:
-      gamemanager.game.pacman.setNextMove(MOVE.UP);
+      this.gamemanager.game.pacman.setNextMove(MOVE.UP);
       break;
     case 39:
-      gamemanager.game.pacman.setNextMove(MOVE.RIGHT);
+      this.gamemanager.game.pacman.setNextMove(MOVE.RIGHT);
       break;
     case 40:
-      gamemanager.game.pacman.setNextMove(MOVE.DOWN);
+      this.gamemanager.game.pacman.setNextMove(MOVE.DOWN);
+      break;
+      case 48:
+        this.gamemanager.game.setLevel(10);
+        this.gamemanager.state = 2; // ready part 2
+        this.gamemanager.counter = 100;
+        this.gamemanager.game.pacman.reset(this.gamemanager.game.level);
+        this.gamemanager.game.ghostManager.reset(this.gamemanager.game.level);
+        break;
+      case 49:
+      case 50:
+      case 51:
+      case 52:
+      case 53:
+      case 54:
+      case 55:
+      case 56:
+      case 57:
+        this.gamemanager.game.setLevel(event.keyCode-48);
+        this.gamemanager.state = 2; // ready part 2
+        this.gamemanager.counter = 100;
+        this.gamemanager.game.pacman.reset(this.gamemanager.game.level);
+        this.gamemanager.game.ghostManager.reset(this.gamemanager.game.level);
+        break;
+    case 83:
+      this.gamemanager.counter = 240;
+      this.gamemanager.state = 7;
       break;
     case 187:
       this.incScale();
@@ -66,7 +91,6 @@ function draw() {
   noSmooth();
   background(0);
   imageMode(CORNER);
-  image(maze_bg, 45 * this.gfxScale, 50 * this.gfxScale, maze_bg.width * this.gfxScale, maze_bg.height * this.gfxScale);
   const tx = 61;
   const ty = 66;
   translate(tx * this.gfxScale, ty * this.gfxScale);

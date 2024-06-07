@@ -1,4 +1,6 @@
 class SimMaze {
+  
+  static PILL_COLORS = ['white', 'yellow', 'red', 'white'];
   static WIDTH = 32;
   static HEIGHT = 32;
   static slowTiles = [
@@ -10,12 +12,23 @@ class SimMaze {
   ];
 
   constructor() {
+    this.backgrounds = [
+      [loadImage('res/maze1.png'), loadImage('res/maze1_b.png')],
+      [loadImage('res/maze2.png'), loadImage('res/maze2_b.png')],
+      [loadImage('res/maze3.png'), loadImage('res/maze3_b.png')],
+      [loadImage('res/maze4.png'), loadImage('res/maze4_b.png')]
+    ];
     this.mazes = Array(4).fill(null).map(() => Array(SimMaze.WIDTH).fill(null).map(() => Array(SimMaze.HEIGHT).fill(null)));
     this.mazeLists = [[],[],[],[]];
     this.mazeID = 0;
     this.pillCount = 0;
     this.currentMaze = this.mazes[0];
+    this.level = 0;
     this.init();
+  }
+
+  incLevel() {
+    this.setMaze(this.level + 1);
   }
 
   init() {
@@ -97,9 +110,24 @@ class SimMaze {
     });
   }
 
+  initMaze(mazeID) {
+    const mazeData = [maze1, maze2, maze3, maze4];
+    const ram = mazeData[mazeID];
+    const graph = this.mazes[mazeID];
+    for (let x = 0; x < SimMaze.WIDTH; x++) {
+      for (let y = 0; y < SimMaze.HEIGHT; y++) {
+        if (ram[x][y] === 0x10 || ram[x][y] === 0x14) {
+          graph[x][y].setValue(ram[x][y]);
+        }
+      }
+    }
+  }
+
   setMaze(level) {
+    this.level = level;
     this.mazeID = this.getMazeID(level);
     this.currentMaze = this.mazes[this.mazeID];
+    this.initMaze(this.mazeID);
     switch (this.mazeID) {
       case 0: this.pillCount = 220; break;
       case 1: this.pillCount = 240; break;
@@ -115,7 +143,7 @@ class SimMaze {
 
   getMazeID(level) {
     if (level > 5) {
-      return ((level - 6) / 4 % 2) + 2;
+      return Math.floor(((level - 6) / 4) % 2) + 2;
     } else if (level > 2) {
       return 1;
     }
@@ -305,14 +333,22 @@ class SimMaze {
 	}
 
   draw(ctx, scale) {
+    // console.log("Maze ID:", this.mazeID);
+    const img = this.backgrounds[this.mazeID][0];
+    image(img, -16 * scale, -16 * scale, img.width * scale, img.height * scale);
     for(let y = 0 ; y < 32 ; y++) {
       for(let x = 0 ; x < 32 ; x++) {
         let tile = this.currentMaze[x][y];
         if (tile) {
-          tile.draw(ctx, scale);
+          tile.draw(ctx, scale), SimMaze.PILL_COLORS[this.mazeID];
         }
       }
     }
+  }
+
+  flash(scale, index) {
+    const img = this.backgrounds[this.mazeID][index];
+    image(img, -16 * scale, -16 * scale, img.width * scale, img.height * scale);
   }
 
 }

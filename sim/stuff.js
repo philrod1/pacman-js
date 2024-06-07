@@ -247,6 +247,49 @@ const pillPositions = [
     new Point(28, 26), new Point(28, 27), new Point(28, 29), new Point(28, 30)]
 ];
 
+// These patterns are inferred from the PacMan Dossier and
+// readings taken from the emulator RAM.  Pairs of bits are
+// read each frame and the _cardinality_ of those bit pairs
+// is the number of pixels moved that frame.  After each
+// read, the patterns are rotated 2 bits, so each pattern
+// repeats after 16 frames of reading.  The KEYS in this
+// object are the *percentages* from the table in the PacMan
+// Dossier.  This so-called percentage is the cardinality of
+// the full 32 bit pattern multiplied by 5.  So the 100%
+// speed equates to 20 pixels per 16 frames.  
+const SPEED_PATTERNS = {
+  40 : 0b00100010001000100010001000100010,
+  45 : 0b00100100010010001001000100100010,
+  50 : 0b00100100100100100010010010010010,
+  55 : 0b00100100100100100100100100100101,
+  60 : 0b00100101001001010010010100100101,
+  75 : 0b10101010010101010101010100101010,
+  80 : 0b10101010101010101010101010101010,
+  85 : 0b01010110101010101010110101010101,
+  90 : 0b01101010110101010110101011010101,
+  95 : 0b01011010110101101011010110101101,
+  100: 0b01011011010110110101101101011011,
+  105: 0b01101101101101101101101101101101
+};
+
+// Levels are 1-indexed, so element 0 is not used.
+// After level 21, the speeds don't change.  The game is in a steady state.
+const LEVEL_SPEEDS = [
+  [0, 80, 90, 90, 90, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,  90],  // PacMan Normal
+  [0, 90, 95, 95, 95, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100,  90],  // PacMan Energised
+  [0, 75, 85, 85, 85,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95,  95],  // Ghost Normal
+  [0, 50, 55, 55, 55,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60,  60],  // Ghost Frightened
+  [0, 40, 45, 45, 45,  50,  50,  50,  50,  50,  50,  50,  50,  50,  50,  50,  50,  50,  50,  50,  50,  50],  // Ghost Tunnel
+  [0, 80, 90, 90, 90, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100],  // Cruise Elroy 1
+  [0, 85, 95, 95, 95, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105]   // Cruise Elroy 2
+];
+
+// How many pills lfet before each Cruise Elroy speed-up.
+const ELROY_DOTS = [
+  [0, 20, 30, 40, 40, 40, 50, 50, 50, 60, 60, 60, 80, 80, 80, 100, 100, 100, 100, 120, 120, 120],
+  [0, 10, 15, 20, 20, 20, 25, 25, 25, 30, 30, 30, 40, 40, 40,  50,  50,  50,  50,  60,  60,  60]
+];
+
 function floydWarshall(maze) {
   const max = 10000;
   const n = WIDTH * HEIGHT;

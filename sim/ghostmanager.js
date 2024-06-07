@@ -11,11 +11,11 @@ class GhostManager {
       this.randomFrames = 300;
   }
 
-  reset() {
+  reset(level, pillCount) {
     this.random = true;
     this.randomFrames = 300;
     for (let ghost of this.ghosts) {
-        ghost.reset();
+        ghost.reset(level, pillCount);
     }
   }
 
@@ -55,7 +55,6 @@ class GhostManager {
       if (this.randomFrames <= 0) {
           this.random = false;
       } else {
-
           this.randomFrames--;
       }
       if (this.globalMode) {

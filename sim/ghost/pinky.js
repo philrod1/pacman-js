@@ -14,7 +14,7 @@ class Pinky extends Ghost {
 		this.state = 3;
 	}
 
-	reset() {
+	reset(level, pillCount) {
 		this.homeNextState = 3;
 		this.homeNextMove = MOVE.UP;
 		this.startPosition = new Point(128, 124);
@@ -23,6 +23,14 @@ class Pinky extends Ghost {
 		this.previousOrientation = MOVE.UP;
 		this.currentOrientation = MOVE.UP;
 		this.state = 3;
+		this.frightened = false;
+		this.currentPatterns = [
+			SPEED_PATTERNS[LEVEL_SPEEDS[2][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[3][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[4][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[5][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[6][level]],
+    ];
 	}
 
 	getPersonalPillReleaseCount(level) {

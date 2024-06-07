@@ -3,8 +3,8 @@ class Pacman {
 	constructor() {
 		this.sprites = loadImage('res/ms_pacman_sprites.png');
     this.stepPatterns = [
-			0b10101010101010101010101010101010,
-			0b11010101011010101101010101101010
+			SPEED_PATTERNS[LEVEL_SPEEDS[0][1]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[1][1]]
     ];
 		this.color = "YELLOW";
     this.pixel = new Point(127,196);
@@ -18,7 +18,7 @@ class Pacman {
     this.alive = true;
 	}
 
-	reset() {
+	reset(level) {
 		this.pixel = new Point(127,196);
     this.tile = new Point(15,24);
     this.isEnergised = false;
@@ -28,6 +28,10 @@ class Pacman {
     this.pauseFrames = 0;
     this.target = new Point(0,9);
     this.alive = true;
+		this.stepPatterns = [
+			SPEED_PATTERNS[LEVEL_SPEEDS[0][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[1][level]]
+    ];
 	}
 	
 	update(game) {
@@ -105,9 +109,8 @@ class Pacman {
 		const index = this.isEnergised ? 1 : 0;
 		const p = this.stepPatterns[index];
 		let val = p & 3;
-		val = (val>1) ? val-1 : val;
 		this.stepPatterns[index] = (p << 2) | (p >>> 30);
-		return val;
+		return Ghost.STEP_MAP[val];
 	}
 
 	setEnergised(isEnergised) {

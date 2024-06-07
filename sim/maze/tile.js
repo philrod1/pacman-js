@@ -113,11 +113,11 @@ class Tile {
         return this.x == that.x && this.y == that.y;
     }
 
-    draw(ctx, scale) {
+    draw(ctx, scale, color) {
         //   ctx.fillStyle = '#222222';
         //   ctx.fillRect(this.x * 8 * scale, this.y * 8 * scale, 8 * scale, 8 * scale);
         if (this.value === 1) {
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = color;
             ctx.beginPath();
             ctx.arc(
                 this.getCentrePoint().x * scale,
@@ -128,7 +128,7 @@ class Tile {
             ctx.fill();
         }
         if (this.value === 2) {
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = color;
             ctx.beginPath();
             ctx.arc(this.getCentrePoint().x * scale, this.getCentrePoint().y * scale, 3 * scale, 0, 3 * Math.PI);
             ctx.fill();

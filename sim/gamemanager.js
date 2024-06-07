@@ -4,11 +4,10 @@ class GameManager {
     this.scale = scale;
     this.ctx = ctx;
     this.state = 0;
-    this.game;
+    this.game = new Game(this.scale);
     this.counter = 100;
     this.updateFunctions = [
       () => { // INITIALISE
-        this.game = new Game(this.scale);
         this.state = 1;
       },
       () => { // GET READY
@@ -25,6 +24,7 @@ class GameManager {
       () => { // READY PART 2
         this.game.pacman.alive = true;
         this.game.drawText("Ready!", 11, 20, "yellow");
+        this.game.drawAgents(this.ctx, this.scale);
         this.counter--;
         if (this.counter === 0) {
           this.counter = 100;
@@ -32,24 +32,22 @@ class GameManager {
         }
       },
       () => { // PLAYING
-        this.game.draw(this.ctx, this.gfxScale);
+        // this.game.draw(this.ctx, this.scale);
         this.game.step();
+        this.game.drawAgents(this.ctx, this.scale);
         if (!this.game.pacman.alive) {
-          if (this.game.lives === 0) {
-            this.state = 4;  // game over
-          } else {
-            this.counter = 100;
-            this.state = 5;  // eaten part 1
-          }
-          console.log("Pill count:" + this.game.maze.pillCount);
+          this.counter = 100;
+          this.state = 5;  // eaten part 1
         }
         else if (this.game.maze.pillCount === 0) {
+          this.counter = 64;
           this.state = 7; // maze complete
         }
       },
       () => { //GAME OVER
         this.game.ghosts = null;
-        this.game.draw(this.ctx, this.gfxScale);
+        // this.game.draw(this.ctx, this.scale);
+        this.game.drawAgents(this.ctx, this.scale);
         this.game.drawText("GAME  OVER", 9, 20, "red");
         noLoop();
       },
@@ -64,8 +62,8 @@ class GameManager {
         } else {
           this.game.pacman.setCurrentMove(MOVE.DOWN);
           this.game.pacman.frame = 5;
-          this.game.ghosts = null;
-          this.counter = 219;
+          // this.game.ghosts = null;
+          this.counter = 87;
           this.state = 6; // eaten part 2
         }
 
@@ -73,32 +71,44 @@ class GameManager {
       () => { // EATEN PART 2
         // Ghosts gone, Pacman 10 turns
         if (this.counter > 0) {
-          if (this.counter % 20 == 0) {
+          if (this.counter % 8 == 0) {
             this.game.pacman.rotate();
           }
           this.game.pacman.draw(this.ctx, this.scale);
           this.counter--;
+        } else if (this.game.lives === 0) {
+          this.state = 4;  // game over
         } else {
           this.game.initGhosts();
           this.game.lives--;
           this.state = 2; // ready part 2
           this.counter = 100;
-          this.game.pacman.reset();
-          this.game.ghostManager.reset();
+          this.game.pacman.reset(this.game.level);
+          this.game.ghostManager.reset(this.game.level, this.game.maze.pillCount);
         }
       },
       () => { //LEVEL COMPLETE
         // Flash the maze four times and increment level
-        this.game.ghosts = null;
-        this.game.draw(this.ctx, this.gfxScale);
-        this.game.drawText("GOOD  JOB!", 9, 20, "green");
-        noLoop();
+        if (this.counter > 0) {
+          const flashFrame = Math.floor(this.counter / 30) % 2;
+          this.game.maze.flash(this.scale, flashFrame);
+          this.game.drawScore();
+          this.game.drawLives();
+          this.counter--;
+        } else {
+          this.counter = 100;
+          this.game.incLevel();
+          this.state = 2; // ready part 2
+          this.counter = 100;
+          this.game.pacman.reset(this.game.level);
+          this.game.ghostManager.reset(this.game.level, this.game.maze.pillCount);
+        }
       }
     ];
   }
 
   update() {
-    this.updateFunctions[this.state]();
     this.game.draw(this.ctx, this.scale);
+    this.updateFunctions[this.state]();
   }
 }

@@ -16,7 +16,7 @@ class Blinky extends Ghost {
 
 	// update(game) {}
 
-	reset() {
+	reset(level, pillCount) {
 		this.homeNextState = 5;
 		this.homeNextMove = MOVE.UP;
 		this.startPosition = new Point(127, 100);
@@ -25,10 +25,19 @@ class Blinky extends Ghost {
 		this.previousOrientation = MOVE.LEFT;
 		this.currentOrientation = MOVE.LEFT;
 		this.state = 4;
-	}
-
-	setCruiseLevel(cruiseLevel) {
-		this.cruiseLevel = cruiseLevel;
+		this.frightened = false;
+		this.currentPatterns = [
+			SPEED_PATTERNS[LEVEL_SPEEDS[2][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[3][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[4][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[5][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[6][level]],
+    ];
+		if (pillCount <= ELROY_DOTS[0][level]) {
+			this.cruiseLevel = 1;
+		} else if (pillCount <= ELROY_DOTS[1][level]) {
+				this.cruiseLevel = 2;
+		}
 	}
 
 	leaveHome() {
@@ -55,7 +64,7 @@ class Blinky extends Ghost {
 			return 2;
 		}
 		let index = 0;
-		if (this.isFrightened) {
+		if (this.frightened) {
 			index = 1;
 		} else if (this.state != 4 || this.slow) {
 			index = 2;
@@ -65,18 +74,13 @@ class Blinky extends Ghost {
 		const p = this.currentPatterns[index];
 		const val = p & 3;
 		this.currentPatterns[index] = (p << 2) | (p >>> 30);
-		// return (val>1) ? val-1 : val;
-		return val;
-	}
-	
-	getCruiseLevel() {
-		return this.cruiseLevel;
+		return Ghost.STEP_MAP[val];
 	}
 
 	getCurrentPattern() {
 		// console.log("Blinky cruise level: " + this.cruiseLevel);
 		let index = 0;
-		if (this.isFrightened) {
+		if (this.frightened) {
 			index = 1;
 		} else if (this.state != 4 || this.slow) {
 			index = 2;
