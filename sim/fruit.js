@@ -23,16 +23,7 @@ class Fruit {
 	}
 	
 	update(game) {
-		// if(this.move == null) return;
-		
-		// if(this.isLegal(this.nextMove, game)) {
-		// 	this.setCurrentMove(this.nextMove);
-		// } else {
-		// 	// return;
-		// }
-		if (this.target.equals(this.tile)) {
-      this.target = new Point(15,18);
-    }
+
 		let steps = this.getSteps();
 		
 		for(let step = 0 ; step < steps ; step++) {
@@ -81,14 +72,19 @@ class Fruit {
         return this.previousOrientation;
       }
 
-        moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
-        const nextTile = game.maze.getNextTile(this.tile, this.currentOrientation);
-        if(this.isDecisionPoint(this.pixel, nextTile, game.maze)) {
-          // this.target = this.getTarget(game);
-          moves = game.maze.getAvailableMoves(nextTile);
-          moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
-          this.currentOrientation = this.calculateMove(game, moves, nextTile, this.target);
+      moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
+      const nextTile = game.maze.getNextTile(this.tile, this.currentOrientation);
+      if (this.isDecisionPoint(this.pixel, nextTile, game.maze)) {
+        console.log("Here", this.target, nextTile);
+        if (this.target.equals(nextTile)) {
+          this.target = new Point(7,5);
+          console.log("new target");
+          // this.target = new Point(18,12);
         }
+        moves = game.maze.getAvailableMoves(nextTile);
+        moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
+        this.currentOrientation = this.calculateMove(game, moves, nextTile, this.target);
+      }
       
       if(this.isTileCentre(this.pixel) && game.maze.isDecisionTile(this.tile)) {
         this.previousOrientation = this.currentOrientation;
