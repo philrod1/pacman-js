@@ -74,7 +74,7 @@ class Blinky extends Ghost {
 		const p = this.currentPatterns[index];
 		const val = p & 3;
 		this.currentPatterns[index] = (p << 2) | (p >>> 30);
-		return Ghost.STEP_MAP[val];
+		return STEP_MAP[val];
 	}
 
 	getCurrentPattern() {

@@ -1,7 +1,5 @@
 
 class Ghost {
-
-	static STEP_MAP = [0, 1, 1, 2];
 	
   constructor() {
 		this.sprites = loadImage('res/ghost_sprites.png');
@@ -30,6 +28,7 @@ class Ghost {
 			SPEED_PATTERNS[LEVEL_SPEEDS[5][1]],
 			SPEED_PATTERNS[LEVEL_SPEEDS[6][1]],
     ];
+		this.chompIndex = -1;
   }
 
 	getState() {
@@ -234,9 +233,14 @@ class Ghost {
 	setFrightened(frightened, game) {
 		this.reverse = frightened;
 		this.frightened = frightened;
+		this.flashing = false;
+		this.flash = 0;
+		this.frame = 0;
 		if (!frightened) {
 			this.tileChanged = true;
 			this.calculateNextMove(game);
+		} else {
+			this.chompIndex = -1;
 		}
 	}
 	
@@ -358,7 +362,7 @@ class Ghost {
 		const p = this.currentPatterns[index];
 		let val = p & 3;
 		this.currentPatterns[index] = (p << 2) | (p >>> 30);
-		return Ghost.STEP_MAP[val];
+		return STEP_MAP[val];
 	}
 
 	setCruiseLevel(cruiseLevel) {}
@@ -419,6 +423,7 @@ class Ghost {
 		}
 		return p;
 	}
+
 	draw(ctx, scale) {
 		let sxOffset = this.currentOrientation.ordinal * 32;
 		let frame_offset = Math.floor((this.frame % 16)/8) * 16;
@@ -428,7 +433,11 @@ class Ghost {
 				this.flash = (this.flash + 1) % 2;
 			}
 		} else if (this.state == 0) {
-			sxOffset = 192 + this.currentOrientation.ordinal * 16;
+			if (this.chompPause > 0) {
+				sxOffset = 256 + 16 * this.chompIndex;
+			} else {
+				sxOffset = 192 + this.currentOrientation.ordinal * 16;
+			}
 			frame_offset = 0;
 			this.flash = 0;
 		} else {

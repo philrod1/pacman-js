@@ -13,6 +13,7 @@ class Game {
         this.lives = 3;
         this.pacman = new Pacman();
         this.maze = new SimMaze();
+        this.fruit = new Fruit();
         this.pacmanOrientations = [MOVE.RIGHT, MOVE.DOWN, MOVE.LEFT, MOVE.UP];
         this.ghostsEaten = 0;
         this.score = 0;
@@ -47,6 +48,7 @@ class Game {
     }
 
     step() {
+        this.fruit.update(this);
         if (this.ghostEatenPauseFramesRemaining > 0) {
             for (let ghost of this.ghosts) {
                 if (ghost.getState() === 0) {
@@ -159,6 +161,7 @@ class Game {
                         this.ghostEatenPauseFramesRemaining = 60;
                         this.ghostsEaten++;
                         this.score += 100 * (1 << this.ghostsEaten);
+                        this.ghostManager.incrementChompIndex();
                         return false;
                     }
                     this.pacman.setAlive(false);
@@ -292,14 +295,19 @@ class Game {
         // this.drawAgents(ctx, scale);
         this.drawScore();
         this.drawLives();
+        this.fruit.draw(ctx, scale);
     }
 
     drawAgents(ctx, scale) {
         if (this.ghosts) {
-            for (let i = 0; i < 4; i++) {
-                this.ghosts[i].draw(ctx, scale);
-            }
+            this.drawGhosts(ctx, scale);
             this.pacman.draw(ctx, scale);
+        }
+    }
+
+    drawGhosts(ctx, scale) {
+        for (let i = 0; i < 4; i++) {
+            this.ghosts[i].draw(ctx, scale);
         }
     }
 

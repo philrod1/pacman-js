@@ -32,9 +32,12 @@ class GameManager {
         }
       },
       () => { // PLAYING
-        // this.game.draw(this.ctx, this.scale);
         this.game.step();
-        this.game.drawAgents(this.ctx, this.scale);
+        if (this.game.ghostEatenPauseFramesRemaining) {
+          this.game.drawGhosts(this.ctx, this.scale);
+        } else {
+          this.game.drawAgents(this.ctx, this.scale);
+        }
         if (!this.game.pacman.alive) {
           this.counter = 100;
           this.state = 5;  // eaten part 1
@@ -44,7 +47,7 @@ class GameManager {
           this.state = 7; // maze complete
         }
       },
-      () => { //GAME OVER
+      () => { // GAME OVER
         this.game.ghosts = null;
         // this.game.draw(this.ctx, this.scale);
         this.game.drawAgents(this.ctx, this.scale);
@@ -87,7 +90,7 @@ class GameManager {
           this.game.ghostManager.reset(this.game.level, this.game.maze.pillCount);
         }
       },
-      () => { //LEVEL COMPLETE
+      () => { // LEVEL COMPLETE
         // Flash the maze four times and increment level
         if (this.counter > 0) {
           const flashFrame = Math.floor(this.counter / 30) % 2;

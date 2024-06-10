@@ -122,4 +122,10 @@ class GhostManager {
   areGhostsRandom() {
       return this.random;
   }
+
+  incrementChompIndex() {
+    for (let ghost of this.ghosts) {
+        ghost.chompIndex++;
+    }
+  }
 }

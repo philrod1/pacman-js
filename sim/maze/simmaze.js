@@ -276,6 +276,7 @@ class SimMaze {
   }
 
   getMoveTowards2(tile, target, moves) {
+    // console.log("getMoveTowards2()", tile, target, moves);
     let d = 100000;
     let m = null;
     try {

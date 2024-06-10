@@ -110,7 +110,7 @@ class Pacman {
 		const p = this.stepPatterns[index];
 		let val = p & 3;
 		this.stepPatterns[index] = (p << 2) | (p >>> 30);
-		return Ghost.STEP_MAP[val];
+		return STEP_MAP[val];
 	}
 
 	setEnergised(isEnergised) {

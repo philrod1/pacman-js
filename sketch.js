@@ -96,5 +96,5 @@ function draw() {
   translate(tx * this.gfxScale, ty * this.gfxScale);
   this.gamemanager.update();
   translate(-tx * this.gfxScale, -ty * this.gfxScale);
-  image(decal, -3 + this.gfxScale, -1 * this.gfxScale, decal.width * this.gfxScale / 2, decal.height * this.gfxScale / 2);
+  // image(decal, -3 + this.gfxScale, -1 * this.gfxScale, decal.width * this.gfxScale / 2, decal.height * this.gfxScale / 2);
 }

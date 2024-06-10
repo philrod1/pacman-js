@@ -284,6 +284,8 @@ const LEVEL_SPEEDS = [
   [0, 85, 95, 95, 95, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105, 105]   // Cruise Elroy 2
 ];
 
+const STEP_MAP = [0, 1, 1, 2];
+
 // How many pills lfet before each Cruise Elroy speed-up.
 const ELROY_DOTS = [
   [0, 20, 30, 40, 40, 40, 50, 50, 50, 60, 60, 60, 80, 80, 80, 100, 100, 100, 100, 120, 120, 120],
