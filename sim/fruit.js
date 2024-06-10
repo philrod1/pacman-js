@@ -1,6 +1,11 @@
 class Fruit {
 	
 	constructor() {
+    this.path = [
+      new Point(4,5),
+      new Point(11,12),
+      new Point(20,15),
+    ]
 		this.sprites = loadImage('res/apple.png');
     this.pixel = new Point(4,76);
     this.tile = new Point(0,9);
@@ -8,7 +13,8 @@ class Fruit {
     this.previousOrientation = MOVE.RIGHT;
     this.frame = 0;
     this.pauseFrames = 0;
-    this.target = new Point(4,5);
+    this.target = new Point(5,5);
+    this.nextTarget = new Point(11,12);
     this.stepPattern = SPEED_PATTERNS[50];
 	}
 
@@ -25,6 +31,13 @@ class Fruit {
 	update(game) {
 
 		let steps = this.getSteps();
+
+    if (this.target.equals(this.tile)) {
+      this.target = this.nextTarget;
+      this.nextTarget = new Point(20, 15);
+      console.log("new target");
+      // this.target = new Point(18,12);
+    }
 		
 		for(let step = 0 ; step < steps ; step++) {
 			
@@ -75,15 +88,10 @@ class Fruit {
       moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
       const nextTile = game.maze.getNextTile(this.tile, this.currentOrientation);
       if (this.isDecisionPoint(this.pixel, nextTile, game.maze)) {
-        console.log("Here", this.target, nextTile);
-        if (this.target.equals(nextTile)) {
-          this.target = new Point(7,5);
-          console.log("new target");
-          // this.target = new Point(18,12);
-        }
         moves = game.maze.getAvailableMoves(nextTile);
         moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
-        this.currentOrientation = this.calculateMove(game, moves, nextTile, this.target);
+        this.currentOrientation = game.maze.getMoveTowards2(nextTile, this.nextTarget, moves);//this.calculateMove(game, moves, nextTile, this.nextTarget);
+        console.log(this.currentOrientation, nextTile, this.nextTarget);
       }
       
       if(this.isTileCentre(this.pixel) && game.maze.isDecisionTile(this.tile)) {
@@ -180,6 +188,7 @@ class Fruit {
 	}
 
 	draw(ctx, scale) {
+    square(this.target.x * 8 * scale, this.target.y * 8 * scale, 8 * scale);
 		const dx = this.pixel.x * scale - 8 * scale;
 		const dy = this.pixel.y * scale - 8 * scale;
 		const dw = 16 * scale;

@@ -266,13 +266,15 @@ class SimMaze {
 	}
 
   getMoveTowards(tile, target) {
-    try {
-			return this.distances[tile.x * HEIGHT + tile.y][target.x * HEIGHT + target.y].move;
-		} catch (e) {
-			console.log("Null pointer exception (" + tile + " and " + target + ") in maze");
-			console.log(e);
-			return null;
-		}
+    this.getMoveTowards2(tile, target, [MOVE.UP, MOVE.DOWN, MOVE.LEFT, MOVE.RIGHT]);
+    // try {
+    //   console.log(this.distances[tile.x * HEIGHT + tile.y]);
+		// 	return this.distances[tile.x * HEIGHT + tile.y][target.x * HEIGHT + target.y].move;
+		// } catch (e) {
+		// 	console.log("Null pointer exception (" + tile + " and " + target + ") in maze");
+		// 	console.log(e);
+		// 	return null;
+		// }
   }
 
   getMoveTowards2(tile, target, moves) {
