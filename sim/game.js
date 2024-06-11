@@ -4,7 +4,7 @@ class Game {
         this.lifeImg = loadImage('res/life.png');
         this.font = loadImage('res/full_font.png');
         this.framesEnergised = [0, 360, 300, 240, 180, 120, 300, 120, 120, 60, 300, 120, 60, 60, 180, 60, 60, 0, 60];
-        this.collisionsEnabled = true;
+        this.collisionsEnabled = false;
 
         this.energisedFramesRemaining = 0;
         this.energiserPauseFramesRemaining = 0;
@@ -152,7 +152,9 @@ class Game {
     }
 
     checkGhostCollision() {
-        // return false;
+        if (!this.collisionsEnabled) {
+            return;
+        }
         for (let ghost of this.ghosts) {
             if (ghost.getTile().equals(this.pacman.tile)) {
                 if (ghost.getState() === 4) {

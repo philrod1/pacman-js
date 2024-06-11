@@ -22,6 +22,7 @@ class GameManager {
         }
       },
       () => { // READY PART 2
+        this.game.fruit.activate(1);
         this.game.pacman.alive = true;
         this.game.drawText("Ready!", 11, 20, "yellow");
         this.game.drawAgents(this.ctx, this.scale);

@@ -294,7 +294,7 @@ class SimMaze {
 			console.log(e);
 			return null;
 		}
-    console.log(moves, m);
+    // console.log(moves, m);
     return m;
   }
 
