@@ -47,7 +47,12 @@ class SimMaze {
     //     }
     //   }
     // }
-    this.distances = calculateMoveDistances(this.mazes[0], 0);
+    this.distances = [
+      calculateMoveDistances(this.mazes[0], 0),
+      calculateMoveDistances(this.mazes[1], 1),
+      calculateMoveDistances(this.mazes[2], 2),
+      calculateMoveDistances(this.mazes[3], 3),
+    ];
     // console.log(this.distances);
     // console.log(JSON.stringify(distances));
     // this.currentMaze = this.mazes[0];
@@ -125,7 +130,8 @@ class SimMaze {
 
   setMaze(level) {
     this.level = level;
-    this.mazeID = this.getMazeID(level);
+    this.mazeID = SimMaze.getMazeID(level);
+    console.log("Maze ID:", this.mazeID, this.level);
     this.currentMaze = this.mazes[this.mazeID];
     this.initMaze(this.mazeID);
     switch (this.mazeID) {
@@ -141,10 +147,10 @@ class SimMaze {
     return this.currentMaze;
   }
 
-  getMazeID(level) {
-    if (level > 5) {
-      return Math.floor(((level - 6) / 4) % 2) + 2;
-    } else if (level > 2) {
+  static getMazeID(level) {
+    if (level > 4) {
+      return Math.floor(((level - 5) / 4) % 2) + 2;
+    } else if (level > 1) {
       return 1;
     }
     return 0;
@@ -282,7 +288,7 @@ class SimMaze {
     let d = 100000;
     let m = null;
     try {
-			const moveDistances = this.distances[tile.x * HEIGHT + tile.y][target.x * HEIGHT + target.y];
+			const moveDistances = this.distances[this.mazeID][tile.x * HEIGHT + tile.y][target.x * HEIGHT + target.y];
       for (const move of moves) {
         if (moveDistances[move.ordinal] < d) {
           m = move;
@@ -336,7 +342,6 @@ class SimMaze {
 	}
 
   draw(ctx, scale) {
-    // console.log("Maze ID:", this.mazeID);
     const img = this.backgrounds[this.mazeID][0];
     image(img, -16 * scale, -16 * scale, img.width * scale, img.height * scale);
     for(let y = 0 ; y < 32 ; y++) {

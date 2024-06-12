@@ -74,7 +74,7 @@ function keyPressed(event) {
         this.gamemanager.game.ghostManager.reset(this.gamemanager.game.level);
         break;
     case 70:
-      this.gamemanager.game.fruit.activate();
+      this.gamemanager.game.fruit.activate(this.gamemanager.game.level);
       break;
     case 83:
       this.gamemanager.counter = 240;
@@ -98,5 +98,5 @@ function draw() {
   translate(tx * this.gfxScale, ty * this.gfxScale);
   this.gamemanager.update();
   translate(-tx * this.gfxScale, -ty * this.gfxScale);
-  image(decal, -3 + this.gfxScale, -1 * this.gfxScale, decal.width * this.gfxScale / 2, decal.height * this.gfxScale / 2);
+  // image(decal, -3 + this.gfxScale, -1 * this.gfxScale, decal.width * this.gfxScale / 2, decal.height * this.gfxScale / 2);
 }

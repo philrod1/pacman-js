@@ -9,6 +9,7 @@ class GameManager {
     this.updateFunctions = [
       () => { // INITIALISE
         this.state = 1;
+        this.game.setLevel(10);
       },
       () => { // GET READY
         this.game.drawText("Player One", 9, 14, "cyan");
@@ -22,10 +23,9 @@ class GameManager {
         }
       },
       () => { // READY PART 2
-        this.game.fruit.activate(1);
         this.game.pacman.alive = true;
         this.game.drawText("Ready!", 11, 20, "yellow");
-        this.game.drawAgents(this.ctx, this.scale);
+        // this.game.drawAgents(this.ctx, this.scale);
         this.counter--;
         if (this.counter === 0) {
           this.counter = 100;
@@ -34,11 +34,11 @@ class GameManager {
       },
       () => { // PLAYING
         this.game.step();
-        if (this.game.ghostEatenPauseFramesRemaining) {
-          this.game.drawGhosts(this.ctx, this.scale);
-        } else {
-          this.game.drawAgents(this.ctx, this.scale);
-        }
+        // if (this.game.ghostEatenPauseFramesRemaining) {
+        //   this.game.drawGhosts(this.ctx, this.scale);
+        // } else {
+        //   this.game.drawAgents(this.ctx, this.scale);
+        // }
         if (!this.game.pacman.alive) {
           this.counter = 100;
           this.state = 5;  // eaten part 1
@@ -97,7 +97,7 @@ class GameManager {
           const flashFrame = Math.floor(this.counter / 30) % 2;
           this.game.maze.flash(this.scale, flashFrame);
           this.game.drawScore();
-          this.game.drawLives();
+          this.game.drawFooter();
           this.counter--;
         } else {
           this.counter = 100;

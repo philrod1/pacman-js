@@ -3,6 +3,7 @@ class Game {
         this.numbers = loadImage('res/numbers.png');
         this.lifeImg = loadImage('res/life.png');
         this.font = loadImage('res/full_font.png');
+        this.fruitSprites = loadImage('res/fruit_sprites.png');
         this.framesEnergised = [0, 360, 300, 240, 180, 120, 300, 120, 120, 60, 300, 120, 60, 60, 180, 60, 60, 0, 60];
         this.collisionsEnabled = false;
 
@@ -296,7 +297,7 @@ class Game {
         this.maze.draw(ctx, scale);
         // this.drawAgents(ctx, scale);
         this.drawScore();
-        this.drawLives();
+        this.drawFooter();
         this.fruit.draw(ctx, scale);
     }
 
@@ -318,19 +319,24 @@ class Game {
         this.drawText(this.score.toString().padStart(7, ' '), 0, 1);
     }
 
-    drawLives() {
+    drawFooter() {
         const x = 4;
         const dy = 32 * 8 * this.scale;
-        const dw = 16 * this.scale;
+        let dw = 16 * this.scale;
         const dh = 16 * this.scale;
         const sy = 0;
-        const sx = 0;
-        const sw = 16;
+        let sx = 0;
+        let sw = 16;
         const sh = 16;
         for (let i = 0 ; i < this.lives ; i++) {
             const dx = (x * 8 + i * 16) * this.scale;
             image(this.lifeImg, dx, dy, dw, dh, sx, sy, sw, sh);
         }
+        sw = 16 * Math.min(this.level, 7);
+        sx = 112 - sw;
+        const dx = (14 * 8 + sx) * this.scale;
+        dw = sw * this.scale;
+        image(this.fruitSprites, dx, dy, dw, dh, sx, sy, sw, sh)
     }
 
     drawText(text, x, y, t = [255, 255, 255]) {

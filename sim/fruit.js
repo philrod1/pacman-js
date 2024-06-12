@@ -1,29 +1,39 @@
 class Fruit {
 
+  static FRUIT_PROBABILITY = [
+    0,0,0,0,0,  // Cherry     (5/32)
+    1,1,1,1,1,  // Strawberry (5/32)
+    2,2,2,2,2,  // Orange     (5/32)
+    3,3,3,3,3,  // Pretzel    (5/32)
+    4,4,4,4,    // Apple      (4/32)
+    5,5,5,5,    // Pear       (4/32)
+    6,6,6,6     // Banana     (4/32)
+  ];
+
 	static IN_PATHS = [
 		[
-			[new Point(0,9), new Point(5,5), new Point(11,12), new Point(20,15)],
-			[new Point(30,9), new Point(26,18), new Point(20,15)],
-			[new Point(30,18), new Point(23,18)],
-			[new Point(0,18), new Point(5,24), new Point(20,24)]
+			[new Point(0,9), new Point(5,5), new Point(11,12), new Point(20,15), new Point(17,18)],
+			[new Point(30,9), new Point(26,18), new Point(19,15), new Point(17,18)],
+			[new Point(30,18), new Point(26,21), new Point(17,18)],
+			[new Point(0,18), new Point(5,24), new Point(20,24), new Point(17,18)]
 		],
 		[
-			[new Point(0,2), new Point(20,12)],
-			[new Point(30,2), new Point(20,12)],
-			[new Point(30,24)],
-			[new Point(0,24), new Point(13,21), new Point(18,24)]
+			[new Point(0,2), new Point(20,12), new Point(18,18)],
+			[new Point(30,2), new Point(20,12), new Point(18,18)],
+			[new Point(30,24), new Point(18,18)],
+			[new Point(0,24), new Point(13,21), new Point(18,24), new Point(18,18)]
 		],
 		[
-			[new Point(0,10), new Point(20,12)],
-			[new Point(30,10), new Point(20,12)],
-			[new Point(30,10), new Point(28,15)],
-			[new Point(0,10), new Point(20,12)]
+			[new Point(0,10), new Point(20,12), new Point(18,18)],
+			[new Point(30,10), new Point(20,12), new Point(18,18)],
+			[new Point(30,10), new Point(28,15), new Point(18,18)],
+			[new Point(0,10), new Point(20,12), new Point(18,18)]
 		],
 		[
-			[new Point(0,14), new Point(11,6), new Point(20,5)],
-			[new Point(30,14)],
-			[new Point(30,17), new Point(17,21)],
-			[new Point(0,17), new Point(17,24)]
+			[new Point(0,14), new Point(11,6), new Point(20,13), new Point(17,18)],
+			[new Point(30,14), new Point(17,18)],
+			[new Point(30,17), new Point(17,21), new Point(17,18)],
+			[new Point(0,17), new Point(17,24), new Point(17,18)]
 		],
 	];
 
@@ -31,33 +41,41 @@ class Fruit {
 		[
 			[new Point(0,9)],
 			[new Point(26,24), new Point(31,9)],
-			[new Point(26,24), new Point(31,18)],
+			[new Point(31,18)],
 			[new Point(14,21), new Point(0,18)]
 		],
 		[
 			[new Point(0,2)],
-			[new Point(17,21), new Point(28,13), new Point(31,2)],
+			[new Point(18,21), new Point(28,11), new Point(31,2)],
 			[new Point(31,24)],
-			[new Point(13,24), new Point(4,21), new Point(0,24)]
+			[new Point(13,24), new Point(5,21), new Point(0,24)]
 		],
 		[
-			[new Point(8,24), new Point(0,10)],
+			[new Point(8,24), new Point(3,21), new Point(0,10)],
 			[new Point(23,24), new Point(20,12), new Point(31,10)],
 			[new Point(23,24), new Point(28,21), new Point(31,10)],
-			[new Point(8,24), new Point(0,10)]
+			[new Point(8,24), new Point(3,21), new Point(0,10)]
 		],
 		[
 			[new Point(0,14)],
-			[new Point(31,14)],
-			[new Point(31,17)],
+			[new Point(23,21), new Point(31,14)],
+			[new Point(23,21), new Point(31,17)],
 			[new Point(8,20), new Point(0,17)]
 		],
 	];
 
-	static HOME_PATH = [new Point(17,18), new Point(11,12), new Point(20, 15), new Point(17,18)];
+	static HOME_PATH = [new Point(11,12), new Point(20, 15), new Point(18,18)];
 
 	constructor() {
-		this.sprites = loadImage('res/apple.png');
+    this.sprites = [
+      loadImage("res/cherry.png"),
+      loadImage("res/strawberry.png"),
+      loadImage("res/orange.png"),
+      loadImage("res/pretzel.png"),
+      loadImage("res/apple.png"),
+      loadImage("res/pear.png"),
+      loadImage("res/banana.png")
+    ];
 		this.pixel = new Point(4, 76);
 		this.tile = new Point(0, 9);
 		this.currentOrientation = MOVE.UP;
@@ -72,7 +90,7 @@ class Fruit {
 		this.fruit = 0;
 	}
 
-	reset(level) {
+	reset() {
 		this.pixel = new Point(0, 0);
 		this.tile = new Point(0, 0);
 		this.move = MOVE.LEFT;
@@ -86,11 +104,15 @@ class Fruit {
 	}
 
 	activate(level) {
-		if (this.active) {
-			return;
-		}
-		let maze = 0;  //TODO - Calculate from level
-		this.fruit = 0; //TODO - Calculate from level
+		// if (this.active) {
+		// 	return;
+		// }
+		let maze = SimMaze.getMazeID(level);
+		this.fruit = level - 1;
+    if (this.fruit > 6) {
+      const choice = nextInt(32);
+      this.fruit = Fruit.FRUIT_PROBABILITY[choice];
+    }
 		this.path = [];
 		const inPathId = nextInt(4);
 		this.path.push(...Fruit.IN_PATHS[maze][inPathId]);
@@ -280,6 +302,9 @@ class Fruit {
 		if (!this.active) {
 			return;
 		}
+    for (const target of this.path) {
+      circle((target.x * 8 + 4) * scale, (target.y * 8 + 4) * scale, 8 * scale);
+    }
 		square(this.target.x * 8 * scale, this.target.y * 8 * scale, 8 * scale);
 		const dx = this.pixel.x * scale - 8 * scale;
 		const dy = this.pixel.y * scale - 8 * scale;
@@ -289,6 +314,6 @@ class Fruit {
 		const sy = 0;
 		const sw = 16;
 		const sh = 16;
-		image(this.sprites, dx, dy, dw, dh, sx, sy, sw, sh);
+		image(this.sprites[this.fruit], dx, dy, dw, dh, sx, sy, sw, sh);
 	}
 }
