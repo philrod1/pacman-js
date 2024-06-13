@@ -29,8 +29,8 @@ class Pacman {
     this.target = new Point(0,9);
     this.alive = true;
 		this.stepPatterns = [
-			SPEED_PATTERNS[LEVEL_SPEEDS[0][level]],
-			SPEED_PATTERNS[LEVEL_SPEEDS[1][level]]
+			SPEED_PATTERNS[LEVEL_SPEEDS[0][Math.min(21, level)]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[1][Math.min(21, level)]]
     ];
 	}
 	

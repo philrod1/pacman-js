@@ -28,7 +28,7 @@ class SimMaze {
   }
 
   incLevel() {
-    this.setMaze(this.level + 1);
+    this.setLevel(this.level + 1);
   }
 
   init() {
@@ -56,11 +56,11 @@ class SimMaze {
     // console.log(this.distances);
     // console.log(JSON.stringify(distances));
     // this.currentMaze = this.mazes[0];
-    this.setMaze(0);
+    this.setLevel(1);
   }
 
   sync(data) {
-		this.setMaze(data.level);
+		this.setLevel(data.level);
 		this.pillCount = 0;
 		for(let pill of data.getPillData()) {
 			this.currentMaze[pill.x][pill.y].setValue(0x10);
@@ -128,7 +128,7 @@ class SimMaze {
     }
   }
 
-  setMaze(level) {
+  setLevel(level) {
     this.level = level;
     this.mazeID = SimMaze.getMazeID(level);
     console.log("Maze ID:", this.mazeID, this.level);
@@ -137,8 +137,8 @@ class SimMaze {
     switch (this.mazeID) {
       case 0: this.pillCount = 220; break;
       case 1: this.pillCount = 240; break;
-      case 2: this.pillCount = 234; break;
-      case 3: this.pillCount = 230; break;
+      case 2: this.pillCount = 238; break;
+      case 3: this.pillCount = 234; break;
       default: this.pillCount = 0;
     }
   }
@@ -148,9 +148,9 @@ class SimMaze {
   }
 
   static getMazeID(level) {
-    if (level > 4) {
-      return Math.floor(((level - 5) / 4) % 2) + 2;
-    } else if (level > 1) {
+    if (level > 5) {
+      return Math.floor(((level - 6) / 4) % 2) + 2;
+    } else if (level > 2) {
       return 1;
     }
     return 0;
@@ -180,11 +180,10 @@ class SimMaze {
     return false;
   }
 
-  getAvailableMoves(point) {
-		if(point.x == 32) point.x = 0;
+  getAvailableMoves(tile) {
+		if(tile.x == 32) tile.x = 0;
 		try {
-			let tile = this.currentMaze[point.x][point.y];
-			return tile.getAvailableMoves();
+			return this.currentMaze[tile.x][tile.y].getAvailableMoves();
 		} catch (e) {
       // console.log(e);
 			return null;
@@ -243,9 +242,9 @@ class SimMaze {
 
   getPills() {
 		let pills = [];
-		for(let p of pillPositions[mazeID]) {
+		for(let p of pillPositions[this.mazeID]) {
 			if (this.currentMaze[p.x][p.y].hasPill()) {
-				pills.add(new Point(px, p.y));
+				pills.push(new Point(p.x, p.y));
 			}
 		}
 		return pills;
@@ -255,7 +254,7 @@ class SimMaze {
 		let pills = [];
 		for(let p of powerPillPositions[mazeID]) {
 			if (this.currentMaze[p.x][p.y].hasPowerPill()) {
-				pills.add(new Point(px, p.y));
+				pills.push(new Point(p.x, p.y));
 			}
 		}
 		return pills;
@@ -288,7 +287,7 @@ class SimMaze {
     let d = 100000;
     let m = null;
     try {
-			const moveDistances = this.distances[this.mazeID][tile.x * HEIGHT + tile.y][target.x * HEIGHT + target.y];
+			const moveDistances = this.getAllDistances(tile, target);
       for (const move of moves) {
         if (moveDistances[move.ordinal] < d) {
           m = move;
@@ -302,6 +301,10 @@ class SimMaze {
 		}
     // console.log(moves, m);
     return m;
+  }
+
+  getAllDistances(p1, p2) {
+    return this.distances[this.mazeID][p1.x * HEIGHT + p1.y][p2.x * HEIGHT + p2.y];
   }
 
   getNextTile(point, move) {

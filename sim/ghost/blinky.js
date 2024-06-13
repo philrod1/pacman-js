@@ -27,15 +27,15 @@ class Blinky extends Ghost {
 		this.state = 4;
 		this.frightened = false;
 		this.currentPatterns = [
-			SPEED_PATTERNS[LEVEL_SPEEDS[2][level]],
-			SPEED_PATTERNS[LEVEL_SPEEDS[3][level]],
-			SPEED_PATTERNS[LEVEL_SPEEDS[4][level]],
-			SPEED_PATTERNS[LEVEL_SPEEDS[5][level]],
-			SPEED_PATTERNS[LEVEL_SPEEDS[6][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[2][Math.min(21, level)]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[3][Math.min(21, level)]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[4][Math.min(21, level)]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[5][Math.min(21, level)]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[6][Math.min(21, level)]],
     ];
-		if (pillCount <= ELROY_DOTS[0][level]) {
+		if (pillCount <= ELROY_DOTS[0][Math.min(21, level)]) {
 			this.cruiseLevel = 1;
-		} else if (pillCount <= ELROY_DOTS[1][level]) {
+		} else if (pillCount <= ELROY_DOTS[1][Math.min(21, level)]) {
 				this.cruiseLevel = 2;
 		}
 	}
@@ -78,7 +78,7 @@ class Blinky extends Ghost {
 	}
 
 	getCurrentPattern() {
-		// console.log("Blinky cruise level: " + this.cruiseLevel);
+		console.log("Blinky.getCurrentPattern() dead function");
 		let index = 0;
 		if (this.frightened) {
 			index = 1;

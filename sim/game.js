@@ -25,7 +25,7 @@ class Game {
         this.extraLife = true;
 
         //   this.level = game.getLevel();
-        //   this.maze.setMaze(game.getLevel());
+        //   this.maze.setLevel(game.getLevel());
         //   this.score = game.getScore();
     }
 
@@ -36,7 +36,7 @@ class Game {
 
     setLevel(level) {
         this.level = level;
-        this.maze.setMaze(level);
+        this.maze.setLevel(level);
     }
 
     initGhosts() {
@@ -49,7 +49,9 @@ class Game {
     }
 
     step() {
+        // console.log(this);
         this.fruit.update(this);
+
         if (this.ghostEatenPauseFramesRemaining > 0) {
             for (let ghost of this.ghosts) {
                 if (ghost.getState() === 0) {
@@ -68,7 +70,6 @@ class Game {
             this.energiserPauseFramesRemaining--;
             return true;
         }
-
         this.ghostManager.update(this.level);
 
         if (this.energisedFramesRemaining > 0) {
@@ -114,10 +115,17 @@ class Game {
                 this.lives++;
                 this.extraLife = false
             }
-            if (this.maze.pillCount <= ELROY_DOTS[0][this.level]) {
+            const pillCount = this.maze.pillCount;
+            if (pillCount === 0) {
+                this.fruit.reset();
+            }
+            if (pillCount <= ELROY_DOTS[0][this.level]) {
                 this.ghosts[0].cruiseLevel = 1;
-            } else if (this.maze.pillCount <= ELROY_DOTS[1][this.level]) {
+            } else if (pillCount <= ELROY_DOTS[1][this.level]) {
                 this.ghosts[0].cruiseLevel = 2;
+            }
+            if (pillCount == 176 || pillCount == 64) {
+                this.fruit.activate(this.level);
             }
         }
 
@@ -168,6 +176,7 @@ class Game {
                         return false;
                     }
                     this.pacman.setAlive(false);
+                    this.fruit.reset();
                     return this.collisionsEnabled;
                 } else {
                     return false;

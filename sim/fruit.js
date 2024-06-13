@@ -13,7 +13,7 @@ class Fruit {
 	static IN_PATHS = [
 		[
 			[new Point(0,9), new Point(5,5), new Point(11,12), new Point(20,15), new Point(17,18)],
-			[new Point(30,9), new Point(26,18), new Point(19,15), new Point(17,18)],
+			[new Point(30,9), new Point(26,18), new Point(20,15), new Point(17,18)],
 			[new Point(30,18), new Point(26,21), new Point(17,18)],
 			[new Point(0,18), new Point(5,24), new Point(20,24), new Point(17,18)]
 		],
@@ -104,10 +104,12 @@ class Fruit {
 	}
 
 	activate(level) {
-		// if (this.active) {
-		// 	return;
-		// }
+		console.log("Activate fruit at level " + level);
+		if (this.active) {
+			return;
+		}
 		let maze = SimMaze.getMazeID(level);
+		console.log("Activate fruit at level", level, "maze", maze);
 		this.fruit = level - 1;
     if (this.fruit > 6) {
       const choice = nextInt(32);
@@ -302,10 +304,10 @@ class Fruit {
 		if (!this.active) {
 			return;
 		}
-    for (const target of this.path) {
-      circle((target.x * 8 + 4) * scale, (target.y * 8 + 4) * scale, 8 * scale);
-    }
-		square(this.target.x * 8 * scale, this.target.y * 8 * scale, 8 * scale);
+    // for (const target of this.path) {
+    //   circle((target.x * 8 + 4) * scale, (target.y * 8 + 4) * scale, 8 * scale);
+    // }
+		// square(this.target.x * 8 * scale, this.target.y * 8 * scale, 8 * scale);
 		const dx = this.pixel.x * scale - 8 * scale;
 		const dy = this.pixel.y * scale - 8 * scale;
 		const dw = 16 * scale;

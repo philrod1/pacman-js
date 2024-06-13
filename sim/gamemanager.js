@@ -5,11 +5,12 @@ class GameManager {
     this.ctx = ctx;
     this.state = 0;
     this.game = new Game(this.scale);
+    this.ai = new TestAI();
     this.counter = 100;
     this.updateFunctions = [
       () => { // INITIALISE
         this.state = 1;
-        this.game.setLevel(10);
+        // this.game.setLevel(21);
       },
       () => { // GET READY
         this.game.drawText("Player One", 9, 14, "cyan");
@@ -25,7 +26,7 @@ class GameManager {
       () => { // READY PART 2
         this.game.pacman.alive = true;
         this.game.drawText("Ready!", 11, 20, "yellow");
-        // this.game.drawAgents(this.ctx, this.scale);
+        this.game.drawAgents(this.ctx, this.scale);
         this.counter--;
         if (this.counter === 0) {
           this.counter = 100;
@@ -33,12 +34,16 @@ class GameManager {
         }
       },
       () => { // PLAYING
+        const move = this.ai.getMove(this.game);
+        // console.log(move);
+        this.game.pacman.nextMove = move;
         this.game.step();
-        // if (this.game.ghostEatenPauseFramesRemaining) {
-        //   this.game.drawGhosts(this.ctx, this.scale);
-        // } else {
-        //   this.game.drawAgents(this.ctx, this.scale);
-        // }
+        if (this.game.ghostEatenPauseFramesRemaining) {
+          this.game.drawGhosts(this.ctx, this.scale);
+        }
+        else {
+          this.game.drawAgents(this.ctx, this.scale);
+        }
         if (!this.game.pacman.alive) {
           this.counter = 100;
           this.state = 5;  // eaten part 1

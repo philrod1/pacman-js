@@ -25,11 +25,11 @@ class Inky extends Ghost {
 		this.state = 3;
 		this.frightened = false;
 		this.currentPatterns = [
-			SPEED_PATTERNS[LEVEL_SPEEDS[2][level]],
-			SPEED_PATTERNS[LEVEL_SPEEDS[3][level]],
-			SPEED_PATTERNS[LEVEL_SPEEDS[4][level]],
-			SPEED_PATTERNS[LEVEL_SPEEDS[5][level]],
-			SPEED_PATTERNS[LEVEL_SPEEDS[6][level]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[2][Math.min(21, level)]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[3][Math.min(21, level)]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[4][Math.min(21, level)]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[5][Math.min(21, level)]],
+			SPEED_PATTERNS[LEVEL_SPEEDS[6][Math.min(21, level)]],
     ];
 	}
 	
