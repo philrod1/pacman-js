@@ -1,6 +1,5 @@
 class SimMaze {
   
-  static PILL_COLORS = ['white', 'yellow', 'red', 'white'];
   static WIDTH = 32;
   static HEIGHT = 32;
   static slowTiles = [
@@ -12,12 +11,6 @@ class SimMaze {
   ];
 
   constructor() {
-    this.backgrounds = [
-      [loadImage('res/maze1.png'), loadImage('res/maze1_b.png')],
-      [loadImage('res/maze2.png'), loadImage('res/maze2_b.png')],
-      [loadImage('res/maze3.png'), loadImage('res/maze3_b.png')],
-      [loadImage('res/maze4.png'), loadImage('res/maze4_b.png')]
-    ];
     this.mazes = Array(4).fill(null).map(() => Array(SimMaze.WIDTH).fill(null).map(() => Array(SimMaze.HEIGHT).fill(null)));
     this.mazeLists = [[],[],[],[]];
     this.mazeID = 0;
@@ -53,9 +46,6 @@ class SimMaze {
       calculateMoveDistances(this.mazes[2], 2),
       calculateMoveDistances(this.mazes[3], 3),
     ];
-    // console.log(this.distances);
-    // console.log(JSON.stringify(distances));
-    // this.currentMaze = this.mazes[0];
     this.setLevel(1);
   }
 
@@ -82,26 +72,22 @@ class SimMaze {
 
   buildGraph(ram, mazeID) {
     let graph = this.mazes[mazeID];
-    let list = this.mazeLists[mazeID];
+    let tiles = this.mazeLists[mazeID];
 
     for (let x = 0; x < SimMaze.WIDTH; x++) {
       for (let y = 0; y < SimMaze.HEIGHT; y++) {
         if (ram[x][y] === 0x40 || ram[x][y] === 0x10 || ram[x][y] === 0x14) {
           graph[x][y] = new Tile(x, y);
-          list.push(graph[x][y]);
+          tiles.push(graph[x][y]);
           graph[x][y].setValue(ram[x][y]);
-          // if (ram[y][x] === 0x10 || ram[y][x] === 0x14) {
-          //   this.pillCount++;
-          // }
         } else {
           graph[x][y] = null;
         }
       }
     }
 
-    list.forEach(tile => {
-      for (const key in MOVE) {
-        let move = MOVE[key];
+    for (const tile of tiles) {
+      for (const move of MOVES) {
         let dx = move.delta.x;
         let dy = move.delta.y;
         let nx = (tile.x + dx + SimMaze.WIDTH) % SimMaze.WIDTH;
@@ -112,7 +98,7 @@ class SimMaze {
         }
       };
       tile.init();
-    });
+    };
   }
 
   initMaze(mazeID) {
@@ -131,7 +117,6 @@ class SimMaze {
   setLevel(level) {
     this.level = level;
     this.mazeID = SimMaze.getMazeID(level);
-    console.log("Maze ID:", this.mazeID, this.level);
     this.currentMaze = this.mazes[this.mazeID];
     this.initMaze(this.mazeID);
     switch (this.mazeID) {
@@ -160,8 +145,8 @@ class SimMaze {
     return this.currentMaze.map(row => row.map(tile => tile ? tile.toChar() : '░').join('')).join('\n');
   }
 
-  pillEaten(msPacmanTile) {
-    let tile = this.currentMaze[msPacmanTile.x][msPacmanTile.y];
+  pillEaten(pacman) {
+    let tile = this.currentMaze[pacman.x][pacman.y];
     if (tile && tile.hasPill()) {
       tile.setHasPill(false);
       this.pillCount--;
@@ -170,8 +155,8 @@ class SimMaze {
     return false;
   }
 
-  powerPillEaten(msPacmanTile) {
-    let tile = this.currentMaze[msPacmanTile.x][msPacmanTile.y];
+  powerPillEaten(pacman) {
+    let tile = this.currentMaze[pacman.x][pacman.y];
     if (tile && tile.hasPowerPill()) {
       tile.setHasPowerPill(false);
       // this.pillCount--;
@@ -270,17 +255,9 @@ class SimMaze {
 		// return maze.getNextDecisionPoint(point, currentMove);
 	}
 
-  getMoveTowards(tile, target) {
-    this.getMoveTowards2(tile, target, [MOVE.UP, MOVE.DOWN, MOVE.LEFT, MOVE.RIGHT]);
-    // try {
-    //   console.log(this.distances[tile.x * HEIGHT + tile.y]);
-		// 	return this.distances[tile.x * HEIGHT + tile.y][target.x * HEIGHT + target.y].move;
-		// } catch (e) {
-		// 	console.log("Null pointer exception (" + tile + " and " + target + ") in maze");
-		// 	console.log(e);
-		// 	return null;
-		// }
-  }
+  // getMoveTowards(tile, target) {
+  //   this.getMoveTowards2(tile, target, [MOVE.UP, MOVE.DOWN, MOVE.LEFT, MOVE.RIGHT]);
+  // }
 
   getMoveTowards2(tile, target, moves) {
     // console.log("getMoveTowards2()", tile, target, moves);
@@ -309,7 +286,9 @@ class SimMaze {
 
   getNextTile(point, move) {
     const tile = this.currentMaze[point.x][point.y];
-    // console.log("Get next move:", point, move, tile);
+    if (!tile) {
+      return null;
+    }
     return tile.getNeighbour(move);
   }
 
@@ -343,23 +322,5 @@ class SimMaze {
         && point.y > 0 
         && point.y < SimMaze.HEIGHT;
 	}
-
-  draw(ctx, scale) {
-    const img = this.backgrounds[this.mazeID][0];
-    image(img, -16 * scale, -16 * scale, img.width * scale, img.height * scale);
-    for(let y = 0 ; y < 32 ; y++) {
-      for(let x = 0 ; x < 32 ; x++) {
-        let tile = this.currentMaze[x][y];
-        if (tile) {
-          tile.draw(ctx, scale), SimMaze.PILL_COLORS[this.mazeID];
-        }
-      }
-    }
-  }
-
-  flash(scale, index) {
-    const img = this.backgrounds[this.mazeID][index];
-    image(img, -16 * scale, -16 * scale, img.width * scale, img.height * scale);
-  }
 
 }

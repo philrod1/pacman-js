@@ -1,5 +1,7 @@
 class Fruit {
 
+	static BOUNCE = [-2, -1, -1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, -1, -1];
+
   static FRUIT_PROBABILITY = [
     0,0,0,0,0,  // Cherry     (5/32)
     1,1,1,1,1,  // Strawberry (5/32)
@@ -9,6 +11,8 @@ class Fruit {
     5,5,5,5,    // Pear       (4/32)
     6,6,6,6     // Banana     (4/32)
   ];
+
+  static FRUIT_SCORES = [100, 200, 500, 700, 1000, 2000, 5000];
 
 	static IN_PATHS = [
 		[
@@ -67,15 +71,6 @@ class Fruit {
 	static HOME_PATH = [new Point(11,12), new Point(20, 15), new Point(18,18)];
 
 	constructor() {
-    this.sprites = [
-      loadImage("res/cherry.png"),
-      loadImage("res/strawberry.png"),
-      loadImage("res/orange.png"),
-      loadImage("res/pretzel.png"),
-      loadImage("res/apple.png"),
-      loadImage("res/pear.png"),
-      loadImage("res/banana.png")
-    ];
 		this.pixel = new Point(4, 76);
 		this.tile = new Point(0, 9);
 		this.currentOrientation = MOVE.UP;
@@ -88,6 +83,7 @@ class Fruit {
 		this.active = false;
 		this.path = [];
 		this.fruit = 0;
+    this.chomped = false;
 	}
 
 	reset() {
@@ -101,15 +97,18 @@ class Fruit {
 		this.active = false;
 		this.path = [];
 		this.fruit = 0;
+    this.chomped = false;
 	}
 
+  getScore() {
+    return Fruit.FRUIT_SCORES[this.fruit];
+  }
+
 	activate(level) {
-		console.log("Activate fruit at level " + level);
 		if (this.active) {
 			return;
 		}
 		let maze = SimMaze.getMazeID(level);
-		console.log("Activate fruit at level", level, "maze", maze);
 		this.fruit = level - 1;
     if (this.fruit > 6) {
       const choice = nextInt(32);
@@ -133,13 +132,17 @@ class Fruit {
 	}
 
 	update(game) {
-
 		if (!this.active) {
 			return;
 		}
-
-		let steps = this.getSteps();
-
+		if (this.pauseFrames > 0) {
+			this.pauseFrames--;
+      if (this.chomped && this.pauseFrames === 0) {
+        this.active = false;
+        this.chomped = false;
+      }
+			return;
+		}
 		if (this.target.equals(this.tile)) {
 			if (this.path.length == 0) {
 				this.active = false;
@@ -150,7 +153,8 @@ class Fruit {
 				this.previousOrientation = this.currentOrientation;
 			}
 		}
-
+		this.frame = (this.frame + 1) % 16;
+		const steps = this.getSteps();
 		for (let step = 0; step < steps; step++) {
 
 			this.previousOrientation = this.calculateNextMove(game);
@@ -167,69 +171,23 @@ class Fruit {
 				this.tile = newTile;
 				this.tileChanged = true;
 			}
-			// this.tile = newTile;
 		}
-	}
-
-	calculateMove(game, moves, tile, target) {
-		let m = this.previousOrientation;
-		const t = game.maze.getTile(tile);
-		let dist = 10000000;
-		for (let move of [MOVE.UP, MOVE.LEFT, MOVE.DOWN, MOVE.RIGHT]) {
-			if (moves.includes(move)) {
-				let next = t.getNeighbour(move);
-				if (next != null) {
-					const d = target.distance(next.getPosition());
-					if (d < dist) {
-						dist = d;
-						m = move;
-					}
-				}
-			}
-		}
-		return m;
 	}
 
 	calculateNextMove(game) {
-		let moves = [];
-
-		moves = game.maze.getAvailableMoves(this.tile);
+		let moves = game.maze.getAvailableMoves(this.tile);
 		if (moves == null) {
 			return this.previousOrientation;
 		}
-
-		// moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
-		const nextTile = game.maze.getNextTile(this.tile, this.currentOrientation);
 		if (game.maze.isDecisionTile(this.tile)) {
 			moves = game.maze.getAvailableMoves(this.tile);
 			moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
 			this.currentOrientation = game.maze.getMoveTowards2(this.tile, this.target, moves);
-			// console.log(this.currentOrientation, nextTile, this.nextTarget);
 		}
-
 		if (this.isTileCentre(this.pixel) && game.maze.isDecisionTile(this.tile)) {
 			this.previousOrientation = this.currentOrientation;
 		}
-
 		return this.previousOrientation;
-
-	}
-
-	isDecisionPoint(pixel, tile, maze) {
-		if (maze.isLegalTilePoint(tile)) {
-			if (maze.isDecisionTile(tile)) {
-				switch (this.previousOrientation) {
-					case MOVE.UP: return pixel.y % 8 == 4;
-					case MOVE.DOWN: return pixel.y % 8 == 4;
-					case MOVE.LEFT: return pixel.x % 8 == 4;
-					case MOVE.RIGHT: return pixel.x % 8 == 4;
-					default: return false;
-				}
-			}
-		} else {
-			// console.log(tile + " is not legal.");
-		}
-		return false;
 	}
 
 	isTileCentre(pixel) {
@@ -245,18 +203,15 @@ class Fruit {
 		}
 	}
 
-	isLegal(move, game) {
-		return game.maze.isLegal(move, this.pixel);
-	}
-
-	setPixelPosition(p) {
-		this.pixel = p;
-		this.tile = new Point(p.x / 8, p.y / 8);
-	}
-
+	// Called by Game when ghost chomped
 	pause(frames) {
 		this.pauseFrames = frames;
 	}
+
+  chomp() {
+    this.chomped = true;
+    this.pauseFrames = 60;
+  }
 
 	getSteps() {
 		const p = this.stepPattern;
@@ -265,57 +220,4 @@ class Fruit {
 		return STEP_MAP[val];
 	}
 
-	incFrame() {
-		this.frame = ++(this.frame) % 16;
-	}
-
-	setCurrentMove(move) {
-		// console.log("Set current move:", move);
-		this.move = move;
-		this.setNextMove(move);
-	}
-
-	setNextMove(move) {
-		this.nextMove = move;
-	}
-
-	getCurrentMove() {
-		if (this.move == null) {
-			this.move = MOVE.LEFT;
-		}
-		return this.move;
-	}
-
-	getTileCentre() {
-		return new Point((this.tile.x * 8) + 3, (this.tile.y * 8) + 4);
-	}
-
-	setTarget(target, game) {
-		this.target = target;
-		// this.move = game.getMaze().getMoveTowards(this.tile, this.target);
-		// if(this.move == null) {
-		// 	this.move = MOVE.LEFT;
-		// 	this.target = new Point(14, 24);
-		// }
-		// this.setCurrentMove(move);
-	}
-
-	draw(ctx, scale) {
-		if (!this.active) {
-			return;
-		}
-    // for (const target of this.path) {
-    //   circle((target.x * 8 + 4) * scale, (target.y * 8 + 4) * scale, 8 * scale);
-    // }
-		// square(this.target.x * 8 * scale, this.target.y * 8 * scale, 8 * scale);
-		const dx = this.pixel.x * scale - 8 * scale;
-		const dy = this.pixel.y * scale - 8 * scale;
-		const dw = 16 * scale;
-		const dh = 16 * scale;
-		const sx = 0; // Which fruit?
-		const sy = 0;
-		const sw = 16;
-		const sh = 16;
-		image(this.sprites[this.fruit], dx, dy, dw, dh, sx, sy, sw, sh);
-	}
 }

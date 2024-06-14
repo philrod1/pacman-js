@@ -1,7 +1,6 @@
 class Pacman {
 	
 	constructor() {
-		this.sprites = loadImage('res/ms_pacman_sprites.png');
     this.stepPatterns = [
 			SPEED_PATTERNS[LEVEL_SPEEDS[0][1]],
 			SPEED_PATTERNS[LEVEL_SPEEDS[1][1]]
@@ -190,17 +189,5 @@ class Pacman {
 			case 3: next = 1; break;
 		}
 		this.setCurrentMove(MOVE_BY_ORDINAL[next]);
-	}
-
-	draw(ctx, scale) {
-		const dx = this.pixel.x * scale - 8 * scale;
-		const dy = this.pixel.y * scale - 8 * scale;
-		const dw = 16 * scale;
-		const dh = 16 * scale;
-		const sx = Math.floor(this.frame/4) * 16; // Which frame?
-		const sy = this.move.ordinal * 16; // Which direction?
-		const sw = 16;
-		const sh = 16;
-		image(this.sprites, dx, dy, dw, dh, sx, sy, sw, sh);
 	}
 }

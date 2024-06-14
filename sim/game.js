@@ -1,12 +1,7 @@
 class Game {
     constructor(scale) {
-        this.numbers = loadImage('res/numbers.png');
-        this.lifeImg = loadImage('res/life.png');
-        this.font = loadImage('res/full_font.png');
-        this.fruitSprites = loadImage('res/fruit_sprites.png');
         this.framesEnergised = [0, 360, 300, 240, 180, 120, 300, 120, 120, 60, 300, 120, 60, 60, 180, 60, 60, 0, 60];
         this.collisionsEnabled = false;
-
         this.energisedFramesRemaining = 0;
         this.energiserPauseFramesRemaining = 0;
         this.ghostEatenPauseFramesRemaining = 0;
@@ -18,15 +13,9 @@ class Game {
         this.pacmanOrientations = [MOVE.RIGHT, MOVE.DOWN, MOVE.LEFT, MOVE.UP];
         this.ghostsEaten = 0;
         this.score = 0;
-
-        this.rng = Math.random;
         this.pacPause = 1;
         this.scale = scale;
         this.extraLife = true;
-
-        //   this.level = game.getLevel();
-        //   this.maze.setLevel(game.getLevel());
-        //   this.score = game.getScore();
     }
 
     incLevel() {
@@ -50,7 +39,6 @@ class Game {
 
     step() {
         // console.log(this);
-        this.fruit.update(this);
 
         if (this.ghostEatenPauseFramesRemaining > 0) {
             for (let ghost of this.ghosts) {
@@ -72,13 +60,12 @@ class Game {
         }
         this.ghostManager.update(this.level);
 
-        if (this.energisedFramesRemaining > 0) {
+        if (this.energisedFramesRemaining >= 0) {
             if (this.energisedFramesRemaining < 120) {
                 for (let ghost of this.ghosts) {
                     ghost.flashing = true;
                 } 
             }
-            this.energisedFramesRemaining--;
             if (this.energisedFramesRemaining == 0) {
                 this.pacman.setEnergised(false);
                 for (let ghost of this.ghosts) {
@@ -86,6 +73,7 @@ class Game {
                     ghost.flashing = false;
                 }
             }
+            this.energisedFramesRemaining--;
         }
 
         this.pacman.update(this);
@@ -94,11 +82,12 @@ class Game {
             return false;
         }
 
+
         for (let ghost of this.ghosts) {
-            if (this.maze.isSlow(ghost.getTile())) {
-                ghost.setSlow(true);
+            if (this.maze.isSlow(ghost.tile)) {
+                ghost.slow = true;
             } else {
-                ghost.setSlow(false);
+                ghost.slow = false;
             }
             ghost.update(this);
         }
@@ -106,6 +95,10 @@ class Game {
         if (this.checkGhostCollision()) {
             return false;
         }
+
+        this.checkFruitCollision();
+        this.fruit.update(this);
+        this.checkFruitCollision();
 
         if (this.maze.pillEaten(this.pacman.tile)) {
             this.pacman.pause(this.pacPause);
@@ -160,6 +153,17 @@ class Game {
         return 0;
     }
 
+    checkFruitCollision() {
+      if (this.fruit.active) {
+        if (this.pacman.tile.equals(this.fruit.tile)) {
+          if (!this.fruit.chomped) {
+            this.score += this.fruit.getScore();
+            this.fruit.chomp();
+          }
+        }
+      }
+    }
+
     checkGhostCollision() {
         if (!this.collisionsEnabled) {
             return;
@@ -169,6 +173,7 @@ class Game {
                 if (ghost.getState() === 4) {
                     if (ghost.frightened) {
                         ghost.chomp(60);
+                        this.fruit.pause(60);
                         this.ghostEatenPauseFramesRemaining = 60;
                         this.ghostsEaten++;
                         this.score += 100 * (1 << this.ghostsEaten);
@@ -300,70 +305,6 @@ class Game {
 
     areGhostsRandom() {
         return this.ghostManager.areGhostsRandom();
-    }
-
-    draw(ctx, scale) {
-        this.maze.draw(ctx, scale);
-        // this.drawAgents(ctx, scale);
-        this.drawScore();
-        this.drawFooter();
-        this.fruit.draw(ctx, scale);
-    }
-
-    drawAgents(ctx, scale) {
-        if (this.ghosts) {
-            this.drawGhosts(ctx, scale);
-            this.pacman.draw(ctx, scale);
-        }
-    }
-
-    drawGhosts(ctx, scale) {
-        for (let i = 0; i < 4; i++) {
-            this.ghosts[i].draw(ctx, scale);
-        }
-    }
-
-    drawScore() {
-        this.drawText("Level " + this.level, 2, 0);
-        this.drawText(this.score.toString().padStart(7, ' '), 0, 1);
-    }
-
-    drawFooter() {
-        const x = 4;
-        const dy = 32 * 8 * this.scale;
-        let dw = 16 * this.scale;
-        const dh = 16 * this.scale;
-        const sy = 0;
-        let sx = 0;
-        let sw = 16;
-        const sh = 16;
-        for (let i = 0 ; i < this.lives ; i++) {
-            const dx = (x * 8 + i * 16) * this.scale;
-            image(this.lifeImg, dx, dy, dw, dh, sx, sy, sw, sh);
-        }
-        sw = 16 * Math.min(this.level, 7);
-        sx = 112 - sw;
-        const dx = (14 * 8 + sx) * this.scale;
-        dw = sw * this.scale;
-        image(this.fruitSprites, dx, dy, dw, dh, sx, sy, sw, sh)
-    }
-
-    drawText(text, x, y, t = [255, 255, 255]) {
-        y = y - 2;
-        x = x + 2;
-        const dy = 8 * this.scale * y;
-        const dw = 8 * this.scale;
-        const dh = 8 * this.scale;
-        const sy = 0;
-        const sw = 8;
-        const sh = 8;
-        tint(t);
-        for (let i = 0 ; i < text.length ; i++) {
-            const dx = (x + i) * 8 * this.scale;
-            const sx = (text.charCodeAt(i) - 32) * 8;
-            image(this.font, dx, dy, dw, dh, sx, sy, sw, sh);
-        }
-        noTint();
     }
 
 }

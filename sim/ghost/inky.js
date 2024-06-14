@@ -52,7 +52,7 @@ class Inky extends Ghost {
       case MOVE.LEFT  : this.target = new Point(t.x-2, t.y  ); break;
       case MOVE.RIGHT : this.target = new Point(t.x+2, t.y  ); break;
 		}
-		const b = game.ghosts[0].getTile();
+		const b = game.ghosts[0].tile;
 		const dx = this.target.x - b.x;
 		const dy = this.target.y - b.y;
 		this.target = new Point(this.target.x + dx, this.target.y + dy);

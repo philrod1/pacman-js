@@ -3,29 +3,29 @@ let decal;
 
 // Load the image.
 function preload() {
-  decal = loadImage('res/decal.png');
 }
 
 function setup() {
-  this.gfxScale = 2;
   frameRate(60);
-  createCanvas(420 * this.gfxScale, 387*this.gfxScale);
-  this.gamemanager = new GameManager(drawingContext, this.gfxScale);
+  createCanvas(1,1);
+  this.gamemanager = new GameManager(drawingContext, this.scale);
+  this.tx = 61;
+  this.ty = 66;
 }
 
 function incScale() {
-  this.setScale(this.gfxScale + 0.1);
+  this.gamemanager.incScale();
 }
 
 function decScale() {
-  this.setScale(this.gfxScale - 0.1);
+  this.gamemanager.decScale();
 }
 
-function setScale(scale) {
-  this.gfxScale = scale;
-  this.gamemanager.game.setScale(scale);
-  resizeCanvas(420 * this.gfxScale, 387*this.gfxScale);
-}
+// function setScale(scale) {
+//   this.scle = scale;
+//   this.gamemanager.game.setScale(scale);
+//   resizeCanvas(420 * scale, 387 * scale);
+// }
 
 let running = true;
 
@@ -56,6 +56,7 @@ function keyPressed(event) {
         this.gamemanager.state = 2; // ready part 2
         this.gamemanager.counter = 100;
         this.gamemanager.game.pacman.reset(this.gamemanager.game.level);
+        this.gamemanager.game.fruit.reset();
         this.gamemanager.game.ghostManager.reset(this.gamemanager.game.level);
         break;
       case 49:
@@ -71,6 +72,7 @@ function keyPressed(event) {
         this.gamemanager.state = 2; // ready part 2
         this.gamemanager.counter = 100;
         this.gamemanager.game.pacman.reset(this.gamemanager.game.level);
+        this.gamemanager.game.fruit.reset();
         this.gamemanager.game.ghostManager.reset(this.gamemanager.game.level);
         break;
     case 70:
@@ -79,6 +81,7 @@ function keyPressed(event) {
     case 83:
       this.gamemanager.counter = 240;
       this.gamemanager.state = 7;
+      this.gamemanager.game.fruit.reset();
       break;
     case 187:
       this.incScale();
@@ -93,10 +96,6 @@ function draw() {
   noSmooth();
   background(0);
   imageMode(CORNER);
-  const tx = 61;
-  const ty = 66;
-  translate(tx * this.gfxScale, ty * this.gfxScale);
+  translate(tx * this.gamemanager.view.scale, ty * this.gamemanager.view.scale);
   this.gamemanager.update();
-  translate(-tx * this.gfxScale, -ty * this.gfxScale);
-  // image(decal, -3 + this.gfxScale, -1 * this.gfxScale, decal.width * this.gfxScale / 2, decal.height * this.gfxScale / 2);
 }

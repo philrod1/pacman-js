@@ -5,16 +5,17 @@ class GameManager {
     this.ctx = ctx;
     this.state = 0;
     this.game = new Game(this.scale);
-    this.ai = new TestAI();
+    this.view = new View(this.game, ctx, scale);
+    this.ai = new EnsembleAI();
     this.counter = 100;
     this.updateFunctions = [
       () => { // INITIALISE
         this.state = 1;
-        // this.game.setLevel(21);
+        // this.game.setLevel(3);
       },
       () => { // GET READY
-        this.game.drawText("Player One", 9, 14, "cyan");
-        this.game.drawText("Ready!", 11, 20, "yellow");
+        this.view.drawText("Player One", 9, 14, "cyan");
+        this.view.drawText("Ready!", 11, 20, "yellow");
         this.counter--;
         if (this.counter === 0) {
           this.game.lives--;
@@ -25,8 +26,8 @@ class GameManager {
       },
       () => { // READY PART 2
         this.game.pacman.alive = true;
-        this.game.drawText("Ready!", 11, 20, "yellow");
-        this.game.drawAgents(this.ctx, this.scale);
+        this.view.drawText("Ready!", 11, 20, "yellow");
+        this.view.drawAgents();
         this.counter--;
         if (this.counter === 0) {
           this.counter = 100;
@@ -35,14 +36,13 @@ class GameManager {
       },
       () => { // PLAYING
         const move = this.ai.getMove(this.game);
-        // console.log(move);
         this.game.pacman.nextMove = move;
         this.game.step();
         if (this.game.ghostEatenPauseFramesRemaining) {
-          this.game.drawGhosts(this.ctx, this.scale);
+          this.view.drawGhosts();
         }
         else {
-          this.game.drawAgents(this.ctx, this.scale);
+          this.view.drawAgents();
         }
         if (!this.game.pacman.alive) {
           this.counter = 100;
@@ -55,16 +55,15 @@ class GameManager {
       },
       () => { // GAME OVER
         this.game.ghosts = null;
-        // this.game.draw(this.ctx, this.scale);
-        this.game.drawAgents(this.ctx, this.scale);
-        this.game.drawText("GAME  OVER", 9, 20, "red");
+        this.view.drawAgents();
+        this.view.drawText("GAME  OVER", 9, 20, "red");
         noLoop();
       },
       () => { // EATEN PART 1
         // All stop, but ghosts keep animating for some time
         if (this.counter > 0) {
           this.counter--;
-          this.game.drawAgents(this.ctx, this.scale);
+          this.view.drawAgents();
           for (let ghost of this.game.ghosts) {
             ghost.incFrame();
           }
@@ -83,7 +82,7 @@ class GameManager {
           if (this.counter % 8 == 0) {
             this.game.pacman.rotate();
           }
-          this.game.pacman.draw(this.ctx, this.scale);
+          this.view.drawPacman();
           this.counter--;
         } else if (this.game.lives === 0) {
           this.state = 4;  // game over
@@ -100,9 +99,9 @@ class GameManager {
         // Flash the maze four times and increment level
         if (this.counter > 0) {
           const flashFrame = Math.floor(this.counter / 30) % 2;
-          this.game.maze.flash(this.scale, flashFrame);
-          this.game.drawScore();
-          this.game.drawFooter();
+          this.view.flashMaze(flashFrame);
+          this.view.drawScore();
+          this.view.drawFooter();
           this.counter--;
         } else {
           this.counter = 100;
@@ -117,7 +116,10 @@ class GameManager {
   }
 
   update() {
-    this.game.draw(this.ctx, this.scale);
+    this.view.drawMaze();
+    this.view.drawScore();
+    this.view.drawFooter();
     this.updateFunctions[this.state]();
+    this.view.drawDecal();
   }
 }
