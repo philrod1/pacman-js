@@ -1,9 +1,9 @@
 class View {
 
-  constructor(game, ctx) {
+  constructor(game, ctx, scale) {
     this.game = game;
     this.ctx = ctx;
-    this.scale = 2;
+    this.scale = scale;
     this.pillColors = ['white', 'yellow', 'red', 'white'];
     this.decal = loadImage('res/decal.png');
     this.ghostSprites = loadImage('res/ghost_sprites.png');
@@ -20,8 +20,37 @@ class View {
       [loadImage('res/maze3.png'), loadImage('res/maze3_b.png')],
       [loadImage('res/maze4.png'), loadImage('res/maze4_b.png')]
     ];
+    this.decalBitImages = [
+      loadImage('res/decal-bit-left-1.png'),
+      loadImage('res/decal-bit-right-1.png'),
+      loadImage('res/decal-bit-left-2.png')
+    ];
+    this.decalBits = [
+      [
+        { img: this.decalBitImages[0], x: -8, y: 68 },
+        { img: this.decalBitImages[0], x: -8, y: 140 },
+        { img: this.decalBitImages[1], x: 240, y: 68 },
+        { img: this.decalBitImages[1], x: 240, y: 140 }
+      ],
+      [
+        { img: this.decalBitImages[0], x: -8, y: 12 },
+        { img: this.decalBitImages[2], x: -8, y: 188 },
+        { img: this.decalBitImages[1], x: 240, y: 12 },
+        { img: this.decalBitImages[1], x: 240, y: 188 }
+      ],
+      [
+        { img: this.decalBitImages[0], x: -8, y: 76 },
+        { img: this.decalBitImages[1], x: 240, y: 76 }
+      ], [
+        { img: this.decalBitImages[0], x: -8, y: 108 },
+        { img: this.decalBitImages[0], x: -8, y: 132 },
+        { img: this.decalBitImages[1], x: 240, y: 108 },
+        { img: this.decalBitImages[1], x: 240, y: 132 }
+      ]
+    ];
     this.tx = 61;
     this.ty = 67;
+    this.textBoxes = [];
     resizeCanvas(420 * this.scale, 387 * this.scale);
   }
 
@@ -59,6 +88,7 @@ class View {
   drawText(text, x, y, t = [255, 255, 255]) {
     y = y - 2;
     x = x + 2;
+    this.textBoxes.push({x: x, y: y, l: text.length});
     const dy = 8 * this.scale * y;
     const dw = 8 * this.scale;
     const dh = 8 * this.scale;
@@ -143,10 +173,9 @@ class View {
     }
   }
 
-  drawMaze() {
+  drawPills() {
     const maze = this.game.maze;
-    const mazeImage = this.mazeImages[maze.mazeID][0];
-    image(mazeImage, -16 * this.scale, -16 * this.scale, mazeImage.width * this.scale, mazeImage.height * this.scale);
+    this.ctx.fillStyle = 'WHITE';
     const color = this.pillColors[maze.mazeID];
     tint(color);
     for (let y = 0; y < 32; y++) {
@@ -154,15 +183,35 @@ class View {
         let tile = maze.currentMaze[x][y];
         if (tile) {
           if (tile.value === 1) {
-            image(this.pill, x * 8 * this.scale, y * 8 * this.scale, 8 * this.scale, 8 * this.scale);
+            // image(this.pill, x * 8 * this.scale, y * 8 * this.scale, 8 * this.scale, 8 * this.scale);
+            this.ctx.beginPath();
+            this.ctx.arc((4 + x * 8) * this.scale, (4 + y * 8) * this.scale, 1 * this.scale, 0, 2 * Math.PI);
+            this.ctx.fill();
           }
           else if (tile.value === 2) {
-            image(this.powerPill, x * 8 * this.scale, y * 8 * this.scale, 8 * this.scale, 8 * this.scale);
+            // image(this.powerPill, x * 8 * this.scale, y * 8 * this.scale, 8 * this.scale, 8 * this.scale);
+            this.ctx.beginPath();
+            this.ctx.arc((4 + x * 8) * this.scale, (4 + y * 8) * this.scale, 3 * this.scale, 0, 2 * Math.PI);
+            this.ctx.fill();
           }
         }
       }
     }
     noTint();
+  }
+
+  drawMaze() {
+    const maze = this.game.maze;
+    const mazeImage = this.mazeImages[maze.mazeID][0];
+    image(mazeImage, -16 * this.scale, -16 * this.scale, mazeImage.width * this.scale, mazeImage.height * this.scale);
+  }
+
+  drawDecalBits() {
+    const maze = this.game.maze;
+    const bits = this.decalBits[maze.mazeID];
+    for (const bit of bits) {
+      image(bit.img, bit.x * this.scale, bit.y * this.scale, bit.img.width * this.scale / 2, bit.img.height * this.scale / 2);
+    }
   }
 
   flashMaze(index) {
@@ -178,5 +227,31 @@ class View {
       this.decal.width * this.scale / 2,
       this.decal.height * this.scale / 2
     );
+  }
+
+  clearAgents() {
+    this.ctx.fillStyle = 'BLACK';
+    const agents = [];
+    if (this.game.ghosts) {
+      agents.push(... this.game.ghosts);
+    }
+    if (this.game.fruit.active) {
+      agents.push(this.game.fruit);
+    }
+    for (const agent of agents) {
+      this.ctx.fillRect((agent.pixel.x - 8) * this.scale, (agent.pixel.y - 8) * this.scale, 16 * this.scale, 16 * this.scale);
+    }
+    const pixel = this.game.pacman.pixel;
+    this.ctx.beginPath();
+    this.ctx.arc((pixel.x) * this.scale, (pixel.y) * this.scale, 8 * this.scale, 0, 2 * Math.PI);
+    this.ctx.fill();
+  }
+
+  clearText() {
+    this.ctx.fillStyle = 'BLACK';
+    for (const textBox of this.textBoxes) {
+      this.ctx.fillRect(textBox.x * 8 * this.scale, textBox.y * 8 * this.scale, textBox.l * 8 * this.scale, 8 * this.scale);
+    }
+    this.textBoxes = [];
   }
 }

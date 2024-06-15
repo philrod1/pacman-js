@@ -6,20 +6,24 @@ class EnsembleAI {
     this.target = new Point(14,24);
     this.move = MOVE.LEFT;
     this.rewardVoices = [
-      new PillMuncher(),
-      new FruitMuncher(),
-      new GhostChaser()
+      {
+        voice: new PillMuncher(),
+        weight: 0.1
+      },
+      {
+        voice: new FruitMuncher(),
+        weight: 1.0
+      },
+      {
+        voice: new GhostChaser(),
+        weight: 1.0
+      }
     ];
     this.riskVoices = [
-      new GhostDodger()
-    ];
-    this.rewardWeights = [
-      0.1,  // Pill Muncher
-      0.5,  // Fruit Muncher
-      1.0   // Ghost Chaser
-    ];
-    this.riskWeights = [
-      1.0   // Ghost Dodger
+      {
+        voice: new GhostDodger(),
+        weight: 1.0
+      }
     ];
   }
 
@@ -31,11 +35,11 @@ class EnsembleAI {
   getMove(game) {
     let results = [0,0,0,0];
     if (game.pacman.tile.equals(this.target)) {
-      for (const voice of this.rewardVoices) {
-        results = results.map((v, i) => v + voice.getPreferences(game)[i]);
+      for (const reward of this.rewardVoices) {
+        results = results.map((v, i) => (v + reward.voice.getPreferences(game)[i] * reward.weight));
       }
-      for (const voice of this.riskVoices) {
-        results = results.map((v, i) => v * voice.getPreferences(game)[i]);
+      for (const risk of this.riskVoices) {
+        results = results.map((v, i) => (v + risk.voice.getPreferences(game)[i] * risk.weight));
       }
       const bestMove = this.getBestMove(results, game);
       this.target = this.getNextTarget(game, bestMove);
@@ -48,7 +52,7 @@ class EnsembleAI {
   getBestMove(results, game) {
     const pacman = game.pacman;
     let moves = game.maze.getAvailableMoves(pacman.tile);
-    moves = moves.filter((m) => m.ordinal !== pacman.move.opposite.ordinal);
+    // moves = moves.filter((m) => m.ordinal !== pacman.move.opposite.ordinal);
     let bestResult = results[moves[0].ordinal];
     let bestMove = moves[0];
     for (const move of moves) {
@@ -94,7 +98,13 @@ class PillMuncher {
 
 class FruitMuncher {
   getPreferences(game) {
-    return [0,0,0,0];
+		const fruit = game.fruit;
+    const pacman = game.pacman.tile;
+		if (fruit.active && !fruit.chomped) {
+      const results = game.maze.getAllDistances(pacman, fruit.tile).map((x) => 1.0/(x + EnsembleAI.EPSILON));
+      return results;
+		}
+		return [0,0,0,0];
   }
 }
 

@@ -14,6 +14,9 @@ class GameManager {
         // this.game.setLevel(3);
       },
       () => { // GET READY
+        this.view.drawMaze();
+        this.view.drawDecal();
+        this.view.drawPills();
         this.view.drawText("Player One", 9, 14, "cyan");
         this.view.drawText("Ready!", 11, 20, "yellow");
         this.counter--;
@@ -25,7 +28,11 @@ class GameManager {
         }
       },
       () => { // READY PART 2
+        this.view.drawMaze();
+        this.view.drawDecal();
+        this.view.drawPills();
         this.game.pacman.alive = true;
+        this.ai.reset();
         this.view.drawText("Ready!", 11, 20, "yellow");
         this.view.drawAgents();
         this.counter--;
@@ -100,6 +107,7 @@ class GameManager {
         if (this.counter > 0) {
           const flashFrame = Math.floor(this.counter / 30) % 2;
           this.view.flashMaze(flashFrame);
+          this.view.drawDecal();
           this.view.drawScore();
           this.view.drawFooter();
           this.counter--;
@@ -116,10 +124,13 @@ class GameManager {
   }
 
   update() {
-    this.view.drawMaze();
+    // this.view.drawMaze();
+    this.view.clearAgents();
+    this.view.clearText();
     this.view.drawScore();
     this.view.drawFooter();
+    this.view.drawPills();
     this.updateFunctions[this.state]();
-    this.view.drawDecal();
+    this.view.drawDecalBits();
   }
 }

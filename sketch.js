@@ -8,7 +8,8 @@ function preload() {
 function setup() {
   frameRate(60);
   createCanvas(1,1);
-  this.gamemanager = new GameManager(drawingContext, this.scale);
+  this.gfxScale = 2;
+  this.gamemanager = new GameManager(drawingContext, this.gfxScale);
   this.tx = 61;
   this.ty = 66;
 }
@@ -22,7 +23,7 @@ function decScale() {
 }
 
 // function setScale(scale) {
-//   this.scle = scale;
+//   this.gfxScale = scale;
 //   this.gamemanager.game.setScale(scale);
 //   resizeCanvas(420 * scale, 387 * scale);
 // }
@@ -94,7 +95,7 @@ function keyPressed(event) {
 
 function draw() {
   noSmooth();
-  background(0);
+  // background(0);
   imageMode(CORNER);
   translate(tx * this.gamemanager.view.scale, ty * this.gamemanager.view.scale);
   this.gamemanager.update();

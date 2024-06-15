@@ -2,73 +2,73 @@ class Fruit {
 
 	static BOUNCE = [-2, -1, -1, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, -1, -1];
 
-  static FRUIT_PROBABILITY = [
-    0,0,0,0,0,  // Cherry     (5/32)
-    1,1,1,1,1,  // Strawberry (5/32)
-    2,2,2,2,2,  // Orange     (5/32)
-    3,3,3,3,3,  // Pretzel    (5/32)
-    4,4,4,4,    // Apple      (4/32)
-    5,5,5,5,    // Pear       (4/32)
-    6,6,6,6     // Banana     (4/32)
-  ];
+	static FRUIT_PROBABILITY = [
+		0, 0, 0, 0, 0,  // Cherry     (5/32)
+		1, 1, 1, 1, 1,  // Strawberry (5/32)
+		2, 2, 2, 2, 2,  // Orange     (5/32)
+		3, 3, 3, 3, 3,  // Pretzel    (5/32)
+		4, 4, 4, 4,    // Apple      (4/32)
+		5, 5, 5, 5,    // Pear       (4/32)
+		6, 6, 6, 6     // Banana     (4/32)
+	];
 
-  static FRUIT_SCORES = [100, 200, 500, 700, 1000, 2000, 5000];
+	static FRUIT_SCORES = [100, 200, 500, 700, 1000, 2000, 5000];
 
 	static IN_PATHS = [
 		[
-			[new Point(0,9), new Point(5,5), new Point(11,12), new Point(20,15), new Point(17,18)],
-			[new Point(30,9), new Point(26,18), new Point(20,15), new Point(17,18)],
-			[new Point(30,18), new Point(26,21), new Point(17,18)],
-			[new Point(0,18), new Point(5,24), new Point(20,24), new Point(17,18)]
+			[new Point(0, 9), new Point(5, 5), new Point(11, 12), new Point(20, 15), new Point(17, 18)],
+			[new Point(30, 9), new Point(26, 18), new Point(20, 15), new Point(17, 18)],
+			[new Point(30, 18), new Point(26, 21), new Point(17, 18)],
+			[new Point(0, 18), new Point(5, 24), new Point(20, 24), new Point(17, 18)]
 		],
 		[
-			[new Point(0,2), new Point(20,12), new Point(18,18)],
-			[new Point(30,2), new Point(20,12), new Point(18,18)],
-			[new Point(30,24), new Point(18,18)],
-			[new Point(0,24), new Point(13,21), new Point(18,24), new Point(18,18)]
+			[new Point(0, 2), new Point(20, 12), new Point(18, 18)],
+			[new Point(30, 2), new Point(20, 12), new Point(18, 18)],
+			[new Point(30, 24), new Point(18, 18)],
+			[new Point(0, 24), new Point(13, 21), new Point(18, 24), new Point(18, 18)]
 		],
 		[
-			[new Point(0,10), new Point(20,12), new Point(18,18)],
-			[new Point(30,10), new Point(20,12), new Point(18,18)],
-			[new Point(30,10), new Point(28,15), new Point(18,18)],
-			[new Point(0,10), new Point(20,12), new Point(18,18)]
+			[new Point(0, 10), new Point(20, 12), new Point(18, 18)],
+			[new Point(30, 10), new Point(20, 12), new Point(18, 18)],
+			[new Point(30, 10), new Point(28, 15), new Point(18, 18)],
+			[new Point(0, 10), new Point(20, 12), new Point(18, 18)]
 		],
 		[
-			[new Point(0,14), new Point(11,6), new Point(20,13), new Point(17,18)],
-			[new Point(30,14), new Point(17,18)],
-			[new Point(30,17), new Point(17,21), new Point(17,18)],
-			[new Point(0,17), new Point(17,24), new Point(17,18)]
+			[new Point(0, 14), new Point(11, 6), new Point(20, 13), new Point(17, 18)],
+			[new Point(30, 14), new Point(17, 18)],
+			[new Point(30, 17), new Point(17, 21), new Point(17, 18)],
+			[new Point(0, 17), new Point(17, 24), new Point(17, 18)]
 		],
 	];
 
 	static OUT_PATHS = [
 		[
-			[new Point(0,9)],
-			[new Point(26,24), new Point(31,9)],
-			[new Point(31,18)],
-			[new Point(14,21), new Point(0,18)]
+			[new Point(0, 9)],
+			[new Point(26, 24), new Point(31, 9)],
+			[new Point(31, 18)],
+			[new Point(14, 21), new Point(0, 18)]
 		],
 		[
-			[new Point(0,2)],
-			[new Point(18,21), new Point(28,11), new Point(31,2)],
-			[new Point(31,24)],
-			[new Point(13,24), new Point(5,21), new Point(0,24)]
+			[new Point(0, 2)],
+			[new Point(18, 21), new Point(28, 11), new Point(31, 2)],
+			[new Point(31, 24)],
+			[new Point(13, 24), new Point(5, 21), new Point(0, 24)]
 		],
 		[
-			[new Point(8,24), new Point(3,21), new Point(0,10)],
-			[new Point(23,24), new Point(20,12), new Point(31,10)],
-			[new Point(23,24), new Point(28,21), new Point(31,10)],
-			[new Point(8,24), new Point(3,21), new Point(0,10)]
+			[new Point(8, 24), new Point(3, 21), new Point(0, 10)],
+			[new Point(23, 24), new Point(20, 12), new Point(31, 10)],
+			[new Point(23, 24), new Point(28, 21), new Point(31, 10)],
+			[new Point(8, 24), new Point(3, 21), new Point(0, 10)]
 		],
 		[
-			[new Point(0,14)],
-			[new Point(23,21), new Point(31,14)],
-			[new Point(23,21), new Point(31,17)],
-			[new Point(8,20), new Point(0,17)]
+			[new Point(0, 14)],
+			[new Point(23, 21), new Point(31, 14)],
+			[new Point(23, 21), new Point(31, 17)],
+			[new Point(8, 20), new Point(0, 17)]
 		],
 	];
 
-	static HOME_PATH = [new Point(11,12), new Point(20, 15), new Point(18,18)];
+	static HOME_PATH = [new Point(11, 12), new Point(20, 15), new Point(18, 18)];
 
 	constructor() {
 		this.pixel = new Point(4, 76);
@@ -83,7 +83,7 @@ class Fruit {
 		this.active = false;
 		this.path = [];
 		this.fruit = 0;
-    this.chomped = false;
+		this.chomped = false;
 	}
 
 	reset() {
@@ -97,12 +97,12 @@ class Fruit {
 		this.active = false;
 		this.path = [];
 		this.fruit = 0;
-    this.chomped = false;
+		this.chomped = false;
 	}
 
-  getScore() {
-    return Fruit.FRUIT_SCORES[this.fruit];
-  }
+	getScore() {
+		return Fruit.FRUIT_SCORES[this.fruit];
+	}
 
 	activate(level) {
 		if (this.active) {
@@ -110,10 +110,10 @@ class Fruit {
 		}
 		let maze = SimMaze.getMazeID(level);
 		this.fruit = level - 1;
-    if (this.fruit > 6) {
-      const choice = nextInt(32);
-      this.fruit = Fruit.FRUIT_PROBABILITY[choice];
-    }
+		if (this.fruit > 6) {
+			const choice = nextInt(32);
+			this.fruit = Fruit.FRUIT_PROBABILITY[choice];
+		}
 		this.path = [];
 		const inPathId = nextInt(4);
 		this.path.push(...Fruit.IN_PATHS[maze][inPathId]);
@@ -137,10 +137,10 @@ class Fruit {
 		}
 		if (this.pauseFrames > 0) {
 			this.pauseFrames--;
-      if (this.chomped && this.pauseFrames === 0) {
-        this.active = false;
-        this.chomped = false;
-      }
+			if (this.chomped && this.pauseFrames === 0) {
+				this.active = false;
+				this.chomped = false;
+			}
 			return;
 		}
 		if (this.target.equals(this.tile)) {
@@ -208,10 +208,10 @@ class Fruit {
 		this.pauseFrames = frames;
 	}
 
-  chomp() {
-    this.chomped = true;
-    this.pauseFrames = 60;
-  }
+	chomp() {
+		this.chomped = true;
+		this.pauseFrames = 60;
+	}
 
 	getSteps() {
 		const p = this.stepPattern;
