@@ -19,16 +19,16 @@ class Pacman {
 
 	copy() {
 		const that = new Pacman();
-		that.stepPatterns = this.stepPatterns;
+		that.stepPatterns = new Array(...this.stepPatterns);
 		that.color = this.color;
-		that.pixel = this.pixel;
-		that.tile = this.tile;
+		that.pixel = new Point(this.pixel.x, this.pixel.y);
+		that.tile = new Point(this.tile.x, this.tile.y);
 		that.energised = this.energised;
 		that.move = this.move;
 		that.nextMove = this.nextMove;
 		that.frame = this.frame;
 		that.pauseFrames = this.pauseFrames;
-		that.target = this.target;
+		that.target = new Point(this.target.x, this.target.y);
 		that.alive = this.alive;
 		return that;
 	}

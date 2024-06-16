@@ -2,8 +2,8 @@ class Game {
 
     static FRAMES_ENERGISED = [0, 360, 300, 240, 180, 120, 300, 120, 120, 60, 300, 120, 60, 60, 180, 60, 60, 0, 60]
 
-    constructor(scale) {
-        this.collisionsEnabled = false;
+    constructor() {
+        this.collisionsEnabled = true;
         this.energisedFramesRemaining = 0;
         this.energiserPauseFramesRemaining = 0;
         this.ghostEatenPauseFramesRemaining = 0;
@@ -12,12 +12,30 @@ class Game {
         this.pacman = new Pacman();
         this.maze = new SimMaze();
         this.fruit = new Fruit();
-        this.pacmanOrientations = [MOVE.RIGHT, MOVE.DOWN, MOVE.LEFT, MOVE.UP];
         this.ghostsEaten = 0;
         this.score = 0;
         this.pacPause = 1;
-        this.scale = scale;
         this.extraLife = true;
+    }
+
+    copy() {
+        const that = new Game();
+        that.collisionsEnabled = this.collisionsEnabled;
+        that.energisedFramesRemaining = this.energisedFramesRemaining;
+        that.energiserPauseFramesRemaining = this.energiserPauseFramesRemaining;
+        that.ghostEatenPauseFramesRemaining = this.ghostEatenPauseFramesRemaining;
+        that.level = this.level;
+        that.lives = this.lives;
+        that.pacman = this.pacman.copy();
+        that.maze = this.maze.copy();
+        that.fruit = this.fruit.copy();
+        that.ghostsEaten = this.ghostsEaten;
+        that.score = this.score;
+        that.pacPause = this.pacPause;
+        that.extraLife = this.extraLife;
+        that.ghostManager = this.ghostManager.copy();
+        that.ghosts = that.ghostManager.ghosts;
+        return that;
     }
 
     initMaze() {
@@ -39,16 +57,12 @@ class Game {
         this.ghostManager = new GhostManager(this.ghosts);
     }
 
-    setScale(scale) {
-        this.scale = scale;
-    }
-
     step() {
         // console.log(this);
 
         if (this.ghostEatenPauseFramesRemaining > 0) {
             for (let ghost of this.ghosts) {
-                if (ghost.getState() === 0) {
+                if (ghost.state === 0) {
                     ghost.update(this);
                 }
             }
@@ -175,8 +189,8 @@ class Game {
             return;
         }
         for (let ghost of this.ghosts) {
-            if (ghost.getTile().equals(this.pacman.tile)) {
-                if (ghost.getState() === 4) {
+            if (ghost.tile.equals(this.pacman.tile)) {
+                if (ghost.state === 4) {
                     if (ghost.frightened) {
                         ghost.chomp(60);
                         this.fruit.pause(60);
@@ -186,7 +200,7 @@ class Game {
                         this.ghostManager.incrementChompIndex();
                         return false;
                     }
-                    this.pacman.setAlive(false);
+                    this.pacman.alive = false;
                     this.fruit.reset();
                     return this.collisionsEnabled;
                 } else {
@@ -197,42 +211,42 @@ class Game {
         return false;
     }
 
-    isTargetSafe(target, snap, depth, move, maze) {
-        if (depth === 0) {
-            return 0;
-        } else {
-            this.syncToDataPoint(snap);
-            let result = this.safeToTarget(target);
-            if (result === 0) {
-                let moves = maze.getAvailableMoves(this.pacman.tile);
-                moves = moves.filter(m => m !== this.pacman.getCurrentMove().opposite);
-                let dataPoint2 = new GameData(this);
-                for (let m of moves) {
-                    let result2 = this.isTargetSafe(maze.getNextDecisionPoint(this.pacman.tile, m), dataPoint2, depth - 1, m, maze);
-                    if (result2 !== 0) {
-                        return result2;
-                    }
-                    this.syncToDataPoint(dataPoint2);
-                }
-            } else if (result === 1) {
-                return 1;
-            }
-        }
-        return 0;
-    }
+    // isTargetSafe(target, snap, depth, move, maze) {
+    //     if (depth === 0) {
+    //         return 0;
+    //     } else {
+    //         this.syncToDataPoint(snap);
+    //         let result = this.safeToTarget(target);
+    //         if (result === 0) {
+    //             let moves = maze.getAvailableMoves(this.pacman.tile);
+    //             moves = moves.filter(m => m !== this.pacman.getCurrentMove().opposite);
+    //             let dataPoint2 = new GameData(this);
+    //             for (let m of moves) {
+    //                 let result2 = this.isTargetSafe(maze.getNextDecisionPoint(this.pacman.tile, m), dataPoint2, depth - 1, m, maze);
+    //                 if (result2 !== 0) {
+    //                     return result2;
+    //                 }
+    //                 this.syncToDataPoint(dataPoint2);
+    //             }
+    //         } else if (result === 1) {
+    //             return 1;
+    //         }
+    //     }
+    //     return 0;
+    // }
 
-    safeToTarget(target) {
-        while (!this.pacman.tile.equals(target)) {
-            this.pacman.setTarget(target);
-            if (this.maze.pillCount === 0) {
-                return 1;
-            }
-            if (!this.step()) {
-                return -1;
-            }
-        }
-        return 0;
-    }
+    // safeToTarget(target) {
+    //     while (!this.pacman.tile.equals(target)) {
+    //         this.pacman.setTarget(target);
+    //         if (this.maze.pillCount === 0) {
+    //             return 1;
+    //         }
+    //         if (!this.step()) {
+    //             return -1;
+    //         }
+    //     }
+    //     return 0;
+    // }
 
     syncToDataPoint(data) {
         this.ghosts[0].setPixelPosition(new Point(data.blinky.px, data.blinky.py));
@@ -278,9 +292,9 @@ class Game {
         this.ghostsEaten = data.ghostsEaten;
     }
 
-    copy() {
-        return new GameData(this);
-    }
+    // copy() {
+    //     return new GameData(this);
+    // }
 
     advanceToNextDecisionPoint(move, maze) {
         let target = maze.getNextDecisionPoint(this.pacman.tile, move);

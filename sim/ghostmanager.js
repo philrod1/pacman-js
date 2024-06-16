@@ -11,6 +11,24 @@ class GhostManager {
         this.randomFrames = 300;
     }
 
+    copy() {
+        const that = new GhostManager([]);
+        that.ghosts = [
+            this.ghosts[0].copy(),
+            this.ghosts[1].copy(),
+            this.ghosts[2].copy(),
+            this.ghosts[3].copy()
+        ];
+        that.globalMode = this.globalMode;
+        that.framesSincePillEaten = this.framesSincePillEaten;
+        that.globalPillCount = this.globalPillCount;
+        that.globalPillLimits = new Array(...this.globalPillLimits);
+        that.ghostPillCounts = new Array(...this.ghostPillCounts);
+        that.random = this.random;
+        that.randomFrames = this.randomFrames;
+        return that;
+    }
+
     reset(level, pillCount) {
         this.random = true;
         this.randomFrames = 300;

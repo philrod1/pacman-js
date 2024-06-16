@@ -25,6 +25,7 @@ class SimMaze {
     that.pillCount = this.pillCount;
     that.currentMaze = that.mazes[that.mazeID];
     that.level = this.level;
+    that.distances = this.distances;
     return that;
   }
 
@@ -35,7 +36,7 @@ class SimMaze {
       for (let x = 0; x < 32; x++) {
         copy[m][x] = [];
         for (let y = 0; y < 32; y++) {
-          copy[m][x][y] = this.mazes[m][x][y].copy();
+          copy[m][x][y] = this.mazes[m][x][y] ? this.mazes[m][x][y].copy() : null;
         }
       }
     }
@@ -175,12 +176,11 @@ class SimMaze {
   }
 
   getAvailableMoves(tile) {
-    // console.log("SimMaze.getAvailableMoves()", tile, this.currentMaze[tile.x][tile.y]);
 		if(tile.x == 32) tile.x = 0;
 		try {
 			return this.currentMaze[tile.x][tile.y].moves;
 		} catch (e) {
-      console.log(e);
+      // console.log(e);
 			return null;
 		}
 	}
@@ -256,14 +256,22 @@ class SimMaze {
 	}
 
   //TODO: This calls out to the "real" maze object.  How can this be fixed?
-  getNextDecisionPoint(point, currentMove, maze) {
-		// let moves = maze.getAvailableMoves(point);
-		// if(!moves.includes(currentMove)) {  // Corner
-		// 	moves = moves.filter((m) => m.ordinal !== this.currentMove.opposite.ordinal);
-		// 	currentMove = moves.get(0);
-		// }
-		// return maze.getNextDecisionPoint(point, currentMove);
+  getNextDecisionPoint(point, currentMove) {
+		let moves = this.getAvailableMoves(point);
+		if(!moves.includes(currentMove)) {  // Corner
+			moves = moves.filter((m) => m.ordinal !== this.currentMove.opposite.ordinal);
+			currentMove = moves.get(0);
+		}
+		return this.getNextDecisionTile(point, currentMove).position;
 	}
+
+  getNextDecisionTile(point, move) {
+    let curr = this.currentMaze[point.x][point.y];
+    while (!curr.decisionPoint) {
+      curr = curr.getNeighbour(move);
+    }
+    return curr;
+  }
 
   // getMoveTowards(tile, target) {
   //   this.getMoveTowards2(tile, target, [MOVE.UP, MOVE.DOWN, MOVE.LEFT, MOVE.RIGHT]);

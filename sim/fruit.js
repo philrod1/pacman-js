@@ -89,8 +89,8 @@ class Fruit {
 	reset() {
 		this.pixel = new Point(0, 0);
 		this.tile = new Point(0, 0);
-		this.move = MOVE.LEFT;
-		this.nextMove = MOVE.LEFT;
+		this.previousOrientation = MOVE.LEFT;
+		this.currentOrientation = MOVE.LEFT;
 		this.frame = 0;
 		this.pauseFrames = 0;
 		this.target = new Point(0, 0);
@@ -102,17 +102,17 @@ class Fruit {
 
 	copy() {
 		const that = new Fruit();
-		that.pixel = this.pixel;
-		that.tile = this.tile;
+		that.pixel = new Point(this.pixel.x, this.pixel.y);
+		that.tile = new Point(this.tile.x, this.tile.y);
 		that.currentOrientation = this.currentOrientation;
 		that.previousOrientation = this.previousOrientation;
 		that.frame = this.frame;
 		that.pauseFrames = this.pauseFrames;
-		that.target = this.target;
-		that.nextTarget = this.nextTarget;
+		that.target = this.target ? new Point(this.target.x, this.target.y) : null;
+		that.nextTarget = this.nextTarget ? new Point(this.nextTarget.x, this.nextTarget.y) : null;
 		that.stepPattern = this.stepPattern;
 		that.active = this.active;
-		that.path = this.path;
+		that.path = [...this.path];
 		that.fruit = this.fruit;
 		that.chomped = this.chomped;
 		return that;

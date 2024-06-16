@@ -72,7 +72,62 @@ class EnsembleAI {
 
 class GhostDodger {
   getPreferences(game) {
-    return [1,1,1,1];
+    if(game.pacman.energised) {
+			return [1,1,1,1];
+		}
+		
+		const stop = Date.now() + 12;
+		const prefs = [0,0,0,0];
+    const counts = [1,1,1,1];
+		const originalGame = game.copy();
+    let simGame;
+    let dead = false;
+		// const maze = originalGame.maze;
+		// const p = originalGame.pacman.tile;
+		// while (Date.now() < stop) {
+			for (const move of game.maze.getAvailableMoves(game.pacman.tile)) {
+        counts[move.ordinal]++;
+        dead = false;
+        simGame = originalGame.copy();
+        simGame.pacman.setNextMove(move);
+        let target = simGame.maze.getNextDecisionPoint(simGame.pacman.tile, move);
+        while (!simGame.pacman.tile.equals(target)) {
+          if (!simGame.step()) {
+            prefs[move.ordinal] = 0;
+            dead = true;
+            break;
+          }
+        }
+        if (dead) {
+          continue;
+        }
+        prefs[move.ordinal] = 1; 
+        for (let i = 0 ; i < 10 ; i++) {
+          prefs[move.ordinal] += this.randomWalk(simGame.copy(), 0, 4);
+        }
+			}
+		// }
+		for (let i = 0 ; i < 4 ; i++) {
+			prefs[i] /= 5;
+		}
+    console.log(prefs);
+		return prefs;
+  }
+
+  randomWalk(game, depth, maxDepth) {
+    if (depth === maxDepth) {
+      return depth;
+    }
+    const moves = game.maze.getAvailableMoves(game.pacman.tile);
+    const move = moves[nextInt(moves.length)];
+    game.pacman.setNextMove(move);
+    let target = game.maze.getNextDecisionPoint(game.pacman.tile, move);
+    while (!game.pacman.tile.equals(target)) {
+      if (!game.step()) {
+        return depth;
+      }
+    }
+    return this.randomWalk(game, depth+1, maxDepth);
   }
 }
 
