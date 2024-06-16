@@ -1,6 +1,8 @@
 class Game {
+
+    static FRAMES_ENERGISED = [0, 360, 300, 240, 180, 120, 300, 120, 120, 60, 300, 120, 60, 60, 180, 60, 60, 0, 60]
+
     constructor(scale) {
-        this.framesEnergised = [0, 360, 300, 240, 180, 120, 300, 120, 120, 60, 300, 120, 60, 60, 180, 60, 60, 0, 60];
         this.collisionsEnabled = false;
         this.energisedFramesRemaining = 0;
         this.energiserPauseFramesRemaining = 0;
@@ -16,6 +18,10 @@ class Game {
         this.pacPause = 1;
         this.scale = scale;
         this.extraLife = true;
+    }
+
+    initMaze() {
+        this.maze.init();
     }
 
     incLevel() {
@@ -148,7 +154,7 @@ class Game {
 
     getEnergisedFrames() {
         if (this.level < 19) {
-            return this.framesEnergised[this.level];
+            return Game.FRAMES_ENERGISED[this.level];
         }
         return 0;
     }

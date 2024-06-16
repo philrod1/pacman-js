@@ -5,6 +5,7 @@ class GameManager {
     this.ctx = ctx;
     this.state = 0;
     this.game = new Game(this.scale);
+    this.game.initMaze();
     this.view = new View(this.game, ctx, scale);
     this.ai = new EnsembleAI();
     this.counter = 100;

@@ -255,7 +255,7 @@ class Ghost {
 			if (moves.includes(move)) {
 				let next = t.getNeighbour(move);
 				if (next != null) {
-					const d = target.distance(next.getPosition());
+					const d = target.distance(next.position);
 					if (d < dist) {
 						dist = d;
 						m = move;

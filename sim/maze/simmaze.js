@@ -11,13 +11,35 @@ class SimMaze {
   ];
 
   constructor() {
-    this.mazes = Array(4).fill(null).map(() => Array(SimMaze.WIDTH).fill(null).map(() => Array(SimMaze.HEIGHT).fill(null)));
-    this.mazeLists = [[],[],[],[]];
+    this.mazes = [];
     this.mazeID = 0;
     this.pillCount = 0;
     this.currentMaze = this.mazes[0];
-    this.level = 0;
-    this.init();
+    this.level = 1;
+  }
+
+  copy() {
+    const that = new SimMaze();
+    that.mazes = this.copyMazes();
+    that.mazeID = this.mazeID;
+    that.pillCount = this.pillCount;
+    that.currentMaze = that.mazes[that.mazeID];
+    that.level = this.level;
+    return that;
+  }
+
+  copyMazes() {
+    const copy = [];
+    for (let m = 0 ; m < 4 ; m++) {
+      copy[m] = [];
+      for (let x = 0; x < 32; x++) {
+        copy[m][x] = [];
+        for (let y = 0; y < 32; y++) {
+          copy[m][x][y] = this.mazes[m][x][y].copy();
+        }
+      }
+    }
+    return copy;
   }
 
   incLevel() {
@@ -25,21 +47,8 @@ class SimMaze {
   }
 
   init() {
+    this.mazes = Array(4).fill(null).map(() => Array(SimMaze.WIDTH).fill(null).map(() => Array(SimMaze.HEIGHT).fill(null)));
     this.buildGraphs();
-    // const dists = {0:{}, 1:{}, 2:{}, 3:{}};
-    // for (let m = 0 ; m < 4 ; m++) {
-    //   this.distances[m] = floydWarshall(this.mazes[m]);
-    //   for (let i = 0 ; i < 1024 ; i++) {
-    //     for (let j = 0 ; j < 1024 ; j++) {
-    //       if (this.distances[m][i][j] >= 0) {
-    //         if (!dists[m][i]) {
-    //           dists[m][i] = {};
-    //         }
-    //         dists[m][i][j] = this.distances[m][i][j];
-    //       }
-    //     }
-    //   }
-    // }
     this.distances = [
       calculateMoveDistances(this.mazes[0], 0),
       calculateMoveDistances(this.mazes[1], 1),
@@ -71,8 +80,8 @@ class SimMaze {
   }
 
   buildGraph(ram, mazeID) {
-    let graph = this.mazes[mazeID];
-    let tiles = this.mazeLists[mazeID];
+    const graph = this.mazes[mazeID];
+    const tiles = [];
 
     for (let x = 0; x < SimMaze.WIDTH; x++) {
       for (let y = 0; y < SimMaze.HEIGHT; y++) {
@@ -166,11 +175,12 @@ class SimMaze {
   }
 
   getAvailableMoves(tile) {
+    // console.log("SimMaze.getAvailableMoves()", tile, this.currentMaze[tile.x][tile.y]);
 		if(tile.x == 32) tile.x = 0;
 		try {
-			return this.currentMaze[tile.x][tile.y].getAvailableMoves();
+			return this.currentMaze[tile.x][tile.y].moves;
 		} catch (e) {
-      // console.log(e);
+      console.log(e);
 			return null;
 		}
 	}
@@ -178,7 +188,8 @@ class SimMaze {
   isJunction(point) {
     if(point.x == 32) point.x = 0;
     let tile = this.currentMaze[point.x][point.y];
-    return tile && tile.isJunction();
+    console.log(tile);
+    return tile && tile.junction;
   }
 
   getTile(tile) {
@@ -188,25 +199,24 @@ class SimMaze {
 
   isDecisionTile(point) {
 		let tile = this.getTile(point);
-		return tile && (tile.isCorner || tile.isJunction);
+		return tile && tile.decisionPoint;
 	}
 
   isLegal(move, pixel) {
     let tile = this.currentMaze[Math.floor(pixel.x / 8)][Math.floor(pixel.y / 8)];
     if (tile == null) return false;
-    let moves = tile.getAvailableMoves();
-    if (moves.some( m => m.ordinal == move.ordinal )) {
+    if (tile.moves.some( m => m.ordinal == move.ordinal )) {
       return true;
     }
     switch (move) {
       case MOVE.UP:
-        return pixel.y > tile.getCentrePoint().y;
+        return pixel.y > tile.centerPoint.y;
       case MOVE.DOWN:
-        return pixel.y < tile.getCentrePoint().y;
+        return pixel.y < tile.centerPoint.y;
       case MOVE.RIGHT:
-        return pixel.x < tile.getCentrePoint().x;
+        return pixel.x < tile.centerPoint.x;
       case MOVE.LEFT:
-        return pixel.x > tile.getCentrePoint().x;
+        return pixel.x > tile.centerPoint.x;
       default:
         return false;
     }

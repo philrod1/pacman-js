@@ -37,7 +37,7 @@ class GameData {
       this.framesSincePillEaten = game.getFramesSincePillEaten();
       this.globalPillCount = game.getGlobalPillCount();
       this.globalMode = game.isGlobalMode();
-      this.pacmanEnenergised = game.pacman.isEnergised();
+      this.pacmanEnenergised = game.pacman.energised;
       this.pillData = game.maze.getPills();
       this.powerPillData = game.maze.getPowerPills();
 

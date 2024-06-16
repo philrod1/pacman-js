@@ -100,6 +100,24 @@ class Fruit {
 		this.chomped = false;
 	}
 
+	copy() {
+		const that = new Fruit();
+		that.pixel = this.pixel;
+		that.tile = this.tile;
+		that.currentOrientation = this.currentOrientation;
+		that.previousOrientation = this.previousOrientation;
+		that.frame = this.frame;
+		that.pauseFrames = this.pauseFrames;
+		that.target = this.target;
+		that.nextTarget = this.nextTarget;
+		that.stepPattern = this.stepPattern;
+		that.active = this.active;
+		that.path = this.path;
+		that.fruit = this.fruit;
+		that.chomped = this.chomped;
+		return that;
+	}
+
 	getScore() {
 		return Fruit.FRUIT_SCORES[this.fruit];
 	}

@@ -19,16 +19,6 @@ class GhostManager {
         }
     }
 
-    //   reset(globalMode, framesSinceLastPillEaten, globalPillCount, ghostPillCounts, random) {
-    //       this.random = random;
-    //       this.globalMode = globalMode;
-    //       this.framesSincePillEaten = framesSinceLastPillEaten;
-    //       this.globalPillCount = globalPillCount;
-    //       for (let i = 1; i < 4; i++) {
-    //           this.ghostPillCounts[i] = ghostPillCounts[i];
-    //       }
-    //   }
-
     releaseTimeout(level) {
         return level < 5 ? 240 : 180;
     }

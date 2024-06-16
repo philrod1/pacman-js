@@ -98,5 +98,7 @@ function draw() {
   // background(0);
   imageMode(CORNER);
   translate(tx * this.gamemanager.view.scale, ty * this.gamemanager.view.scale);
+  // console.time("Update");
   this.gamemanager.update();
+  // console.timeEnd("Update");
 }

@@ -460,7 +460,7 @@ function pathDistancePoint(point1, point2, mazeID) {
 }
 
 function pathDistanceTile(tile1, tile2, mazeID) {
-  return pathDistancePoint(tile1.getPosition(), tile2.getPosition(), mazeID);
+  return pathDistancePoint(tile1.position, tile2.position, mazeID);
 }
 
 function aStarDistance(tile1, tile2, mazeID) {
@@ -480,7 +480,7 @@ function aStarDistance(tile1, tile2, mazeID) {
           }
           return count;
       }
-      for (const neighbour of current.tile.getNeighbours()) {
+      for (const neighbour of current.tile.neighbours) {
           if (neighbour) {
               const d = pathDistanceTile(tile2, neighbour, mazeID);
               if (d >= 0 && !visited.has(neighbour)) {
@@ -541,12 +541,12 @@ function calculateMoveDistances(graph, mazeID) {
             const node2 = graph[x2][y2];
             if (node2) {
               const d = [10000, 10000, 10000, 10000]; // Assuming there are 4 possible moves.
-              for (let move of node.getAvailableMoves()) {
+              for (let move of node.moves) {
                 node.blockAllExcept(move);
                 d[move.ordinal] = aStarDistance(node, node2, mazeID);
                 node.unblockAllMoves();
               }
-              const tile2 = node2.getPosition();
+              const tile2 = node2.position;
               mapForNode[tile2.x * HEIGHT + tile2.y] = d;
             }
           }
