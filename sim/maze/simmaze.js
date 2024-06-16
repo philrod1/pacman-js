@@ -255,18 +255,17 @@ class SimMaze {
 		return pills;
 	}
 
-  //TODO: This calls out to the "real" maze object.  How can this be fixed?
   getNextDecisionPoint(point, currentMove) {
 		let moves = this.getAvailableMoves(point);
 		if(!moves.includes(currentMove)) {  // Corner
-			moves = moves.filter((m) => m.ordinal !== this.currentMove.opposite.ordinal);
+			moves = moves.filter((m) => m.ordinal !== currentMove.opposite.ordinal);
 			currentMove = moves.get(0);
 		}
 		return this.getNextDecisionTile(point, currentMove).position;
 	}
 
   getNextDecisionTile(point, move) {
-    let curr = this.currentMaze[point.x][point.y];
+    let curr = this.currentMaze[point.x][point.y].getNeighbour(move);
     while (!curr.decisionPoint) {
       curr = curr.getNeighbour(move);
     }

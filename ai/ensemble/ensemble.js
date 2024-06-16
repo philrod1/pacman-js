@@ -78,39 +78,36 @@ class GhostDodger {
 		
 		const stop = Date.now() + 12;
 		const prefs = [0,0,0,0];
-    const counts = [1,1,1,1];
-		const originalGame = game.copy();
     let simGame;
     let dead = false;
-		// const maze = originalGame.maze;
-		// const p = originalGame.pacman.tile;
-		// while (Date.now() < stop) {
-			for (const move of game.maze.getAvailableMoves(game.pacman.tile)) {
-        counts[move.ordinal]++;
-        dead = false;
-        simGame = originalGame.copy();
-        simGame.pacman.setNextMove(move);
-        let target = simGame.maze.getNextDecisionPoint(simGame.pacman.tile, move);
-        while (!simGame.pacman.tile.equals(target)) {
-          if (!simGame.step()) {
-            prefs[move.ordinal] = 0;
-            dead = true;
-            break;
-          }
+
+    for (const move of game.maze.getAvailableMoves(game.pacman.tile)) {
+      dead = false;
+      simGame = game.copy();
+      simGame.pacman.setNextMove(move);
+      let target = simGame.maze.getNextDecisionPoint(simGame.pacman.tile, move);
+      while (!simGame.pacman.tile.equals(target)) {
+        if (!simGame.step()) {
+          prefs[move.ordinal] = 0;
+          dead = true;
+          break;
         }
-        if (dead) {
-          continue;
-        }
-        prefs[move.ordinal] = 1; 
-        for (let i = 0 ; i < 10 ; i++) {
-          prefs[move.ordinal] += this.randomWalk(simGame.copy(), 0, 4);
-        }
-			}
-		// }
+      }
+      if (dead) {
+        console.log("DEAD", move);
+        continue;
+      }
+      prefs[move.ordinal] = 0; 
+      for (let i = 0 ; i < 5 ; i++) {
+        prefs[move.ordinal] += this.randomWalk(simGame.copy(), 0, 8);
+      }
+    }
+      
 		for (let i = 0 ; i < 4 ; i++) {
-			prefs[i] /= 5;
+      prefs[i] = Math.min(prefs[i], 20);
+			prefs[i] /= 20;
 		}
-    console.log(prefs);
+    // console.log(prefs);
 		return prefs;
   }
 
@@ -122,9 +119,12 @@ class GhostDodger {
     const move = moves[nextInt(moves.length)];
     game.pacman.setNextMove(move);
     let target = game.maze.getNextDecisionPoint(game.pacman.tile, move);
+    // console.log(game.pacman.tile, target);
     while (!game.pacman.tile.equals(target)) {
-      if (!game.step()) {
-        return depth;
+      let result = game.step();
+      // console.log(result);
+      if (!result) {
+        return 0;
       }
     }
     return this.randomWalk(game, depth+1, maxDepth);

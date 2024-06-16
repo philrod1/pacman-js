@@ -58,7 +58,6 @@ class Game {
     }
 
     step() {
-        // console.log(this);
 
         if (this.ghostEatenPauseFramesRemaining > 0) {
             for (let ghost of this.ghosts) {
@@ -71,9 +70,6 @@ class Game {
         }
 
         if (this.energiserPauseFramesRemaining > 0) {
-            // for (let ghost of this.ghosts) {
-            //     ghost.update(this);
-            // }
             this.ghosts.map(ghost => ghost.update(this));
             this.energiserPauseFramesRemaining--;
             return true;
