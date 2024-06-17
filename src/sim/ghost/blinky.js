@@ -34,7 +34,7 @@ class Blinky extends Ghost {
 		that.homeLeft = this.homeLeft;
 		that.homeRight = this.homeRight;
 		that.reverse = this.reverse;
-		that.currentPatterns = this.currentPatterns;
+		that.currentPatterns = [...this.currentPatterns];
 		that.chompIndex = this.chompIndex;
 		that.color = this.color;
 		that.gid = this.gid;

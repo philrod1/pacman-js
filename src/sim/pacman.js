@@ -13,7 +13,7 @@ class Pacman {
 		this.nextMove = MOVE.LEFT;
 		this.frame = 0;
 		this.pauseFrames = 0;
-		this.target = new Point(0, 9);
+		// this.target = new Point(0, 9);
 		this.alive = true;
 	}
 
@@ -28,7 +28,7 @@ class Pacman {
 		that.nextMove = this.nextMove;
 		that.frame = this.frame;
 		that.pauseFrames = this.pauseFrames;
-		that.target = new Point(this.target.x, this.target.y);
+		// that.target = new Point(this.target.x, this.target.y);
 		that.alive = this.alive;
 		return that;
 	}
@@ -41,7 +41,7 @@ class Pacman {
 		this.nextMove = MOVE.LEFT;
 		this.frame = 0;
 		this.pauseFrames = 0;
-		this.target = new Point(0, 9);
+		// this.target = new Point(0, 9);
 		this.alive = true;
 		this.stepPatterns = [
 			SPEED_PATTERNS[LEVEL_SPEEDS[0][Math.min(21, level)]],
@@ -55,6 +55,7 @@ class Pacman {
 		if (this.isLegal(this.nextMove, game)) {
 			this.setCurrentMove(this.nextMove);
 		} else {
+      // console.log("Pacman update():", this.nextMove, "is not a legal move.");
 			// return;
 		}
 
@@ -108,7 +109,7 @@ class Pacman {
 	}
 
 	isLegal(move, game) {
-		return game.maze.isLegal(move, this.pixel);
+		return SimMaze.DATA.isLegal(move, this.pixel, game.maze.mazeID);
 	}
 
 	setPixelPosition(p) {
@@ -174,19 +175,19 @@ class Pacman {
 		this.stepPatterns[1] = pacmanPatterns[1];
 	}
 
-	setTarget(target, game) {
-		this.target = target;
-		// this.move = game.getMaze().getMoveTowards(this.tile, this.target);
-		// if(this.move == null) {
-		// 	this.move = MOVE.LEFT;
-		// 	this.target = new Point(14, 24);
-		// }
-		// this.setCurrentMove(move);
-	}
+	// setTarget(target, game) {
+	// 	this.target = target;
+	// 	// this.move = game.getMaze().getMoveTowards(this.tile, this.target);
+	// 	// if(this.move == null) {
+	// 	// 	this.move = MOVE.LEFT;
+	// 	// 	this.target = new Point(14, 24);
+	// 	// }
+	// 	// this.setCurrentMove(move);
+	// }
 
-	getTarget() {
-		return this.target;
-	}
+	// getTarget() {
+	// 	return this.target;
+	// }
 
 	setAlive(alive) {
 		this.alive = alive;

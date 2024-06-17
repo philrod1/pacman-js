@@ -1,13 +1,13 @@
-class Sue extends Ghost {
+class Inky extends Ghost {
 	
 	constructor() {
 		super();
-		this.color = "ORANGE";
-		this.gid = 3;
+		this.color = "CYAN";
+		this.gid = 2;
 		this.homeNextState = 2;
-		this.homeNextMove = MOVE.RIGHT;
-		this.startPosition = new Point(143, 124);
-		this.pixel = new Point(143, 124);
+		this.homeNextMove = MOVE.LEFT;
+		this.startPosition = new Point(112, 124);
+		this.pixel = new Point(112, 124);
 		this.tile = new Point(this.pixel.x/8, this.pixel.y/8);
 		this.previousOrientation = MOVE.UP;
 		this.currentOrientation = MOVE.UP;
@@ -15,7 +15,7 @@ class Sue extends Ghost {
 	}
 
 	copy() {
-		const that = new Sue();
+		const that = new Inky();
 		that.currentOrientation = this.currentOrientation;
 		that.previousOrientation = this.previousOrientation;
 		that.cruiseLevel = this.cruiseLevel;
@@ -34,7 +34,7 @@ class Sue extends Ghost {
 		that.homeLeft = this.homeLeft;
 		that.homeRight = this.homeRight;
 		that.reverse = this.reverse;
-		that.currentPatterns = this.currentPatterns;
+		that.currentPatterns = [...this.currentPatterns];
 		that.chompIndex = this.chompIndex;
 		that.color = this.color;
 		that.gid = this.gid;
@@ -49,9 +49,9 @@ class Sue extends Ghost {
 
 	reset(level, pillCount) {
 		this.homeNextState = 2;
-		this.homeNextMove = MOVE.RIGHT;
-		this.startPosition = new Point(143, 124);
-		this.pixel = new Point(143, 124);
+		this.homeNextMove = MOVE.LEFT;
+		this.startPosition = new Point(112, 124);
+		this.pixel = new Point(112, 124);
 		this.tile = new Point(this.pixel.x/8, this.pixel.y/8);
 		this.previousOrientation = MOVE.UP;
 		this.currentOrientation = MOVE.UP;
@@ -73,27 +73,27 @@ class Sue extends Ghost {
 		this.previousOrientation = MOVE.RIGHT;
 		this.currentOrientation = MOVE.UP;
 	}
-
-	getPersonalPillReleaseCount(level) {
-		switch (level) {
-      case 1:  return 60;
-      case 2:  return 50;
-      default: return 0;
-		}
-	}
-
+	
 	getTarget(game) {
 		const t = game.pacman.tile;
 		if(t == null) {
 			return new Point(15, 24);
 		}
-		let distance = Math.floor(this.tile.distance(t));
-		distance *= distance;
-		this.target = new Point(2, 33);
-		if(distance > 64) {
-			this.target = new Point(t.x, t.y);
+		switch(game.pacman.getCurrentMove()) {
+      case MOVE.UP    : this.target = new Point(t.x-2, t.y-2); break;
+      case MOVE.DOWN  : this.target = new Point(t.x,   t.y+2); break;
+      case MOVE.LEFT  : this.target = new Point(t.x-2, t.y  ); break;
+      case MOVE.RIGHT : this.target = new Point(t.x+2, t.y  ); break;
 		}
+		const b = game.ghosts[0].tile;
+		const dx = this.target.x - b.x;
+		const dy = this.target.y - b.y;
+		this.target = new Point(this.target.x + dx, this.target.y + dy);
 		return this.target;
+	}
+
+	getPersonalPillReleaseCount(level) {
+		return level == 1 ? 30 : 0;
 	}
 	
 }

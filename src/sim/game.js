@@ -100,7 +100,7 @@ class Game {
 
 
         for (let ghost of this.ghosts) {
-            if (this.maze.isSlow(ghost.tile)) {
+            if (SimMaze.DATA.isSlow(ghost.tile, this.maze.mazeID)) {
                 ghost.slow = true;
             } else {
                 ghost.slow = false;

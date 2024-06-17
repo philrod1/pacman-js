@@ -1,13 +1,13 @@
-class Inky extends Ghost {
+class Pinky extends Ghost {
 	
 	constructor() {
 		super();
-		this.color = "CYAN";
-		this.gid = 2;
-		this.homeNextState = 2;
-		this.homeNextMove = MOVE.LEFT;
-		this.startPosition = new Point(112, 124);
-		this.pixel = new Point(112, 124);
+		this.color = "PINK";
+		this.gid = 1;
+		this.homeNextState = 3;
+		this.homeNextMove = MOVE.UP;
+		this.startPosition = new Point(128, 124);
+		this.pixel = new Point(128, 124);
 		this.tile = new Point(this.pixel.x/8, this.pixel.y/8);
 		this.previousOrientation = MOVE.UP;
 		this.currentOrientation = MOVE.UP;
@@ -15,7 +15,7 @@ class Inky extends Ghost {
 	}
 
 	copy() {
-		const that = new Inky();
+		const that = new Pinky();
 		that.currentOrientation = this.currentOrientation;
 		that.previousOrientation = this.previousOrientation;
 		that.cruiseLevel = this.cruiseLevel;
@@ -34,7 +34,7 @@ class Inky extends Ghost {
 		that.homeLeft = this.homeLeft;
 		that.homeRight = this.homeRight;
 		that.reverse = this.reverse;
-		that.currentPatterns = this.currentPatterns;
+		that.currentPatterns = [...this.currentPatterns];
 		that.chompIndex = this.chompIndex;
 		that.color = this.color;
 		that.gid = this.gid;
@@ -48,10 +48,10 @@ class Inky extends Ghost {
 	}
 
 	reset(level, pillCount) {
-		this.homeNextState = 2;
-		this.homeNextMove = MOVE.LEFT;
-		this.startPosition = new Point(112, 124);
-		this.pixel = new Point(112, 124);
+		this.homeNextState = 3;
+		this.homeNextMove = MOVE.UP;
+		this.startPosition = new Point(128, 124);
+		this.pixel = new Point(128, 124);
 		this.tile = new Point(this.pixel.x/8, this.pixel.y/8);
 		this.previousOrientation = MOVE.UP;
 		this.currentOrientation = MOVE.UP;
@@ -65,35 +65,30 @@ class Inky extends Ghost {
 			SPEED_PATTERNS[LEVEL_SPEEDS[6][Math.min(21, level)]],
     ];
 	}
-	
+
+	getPersonalPillReleaseCount(level) {
+		return 0;
+	}
+
 	leaveHome() {
 		// return
-		this.state = 6;
-		this.target = new Point(this.home.x, this.home.y);
-		this.previousOrientation = MOVE.RIGHT;
-		this.currentOrientation = MOVE.UP;
+		this.state = 5;
+		this.target = this.door;
+		this.previousOrientation = MOVE.UP;
 	}
-	
+
 	getTarget(game) {
 		const t = game.pacman.tile;
 		if(t == null) {
 			return new Point(15, 24);
 		}
 		switch(game.pacman.getCurrentMove()) {
-      case MOVE.UP    : this.target = new Point(t.x-2, t.y-2); break;
-      case MOVE.DOWN  : this.target = new Point(t.x,   t.y+2); break;
-      case MOVE.LEFT  : this.target = new Point(t.x-2, t.y  ); break;
-      case MOVE.RIGHT : this.target = new Point(t.x+2, t.y  ); break;
+      case MOVE.UP    : this.target = new Point(t.x-4, t.y-4); break;
+      case MOVE.DOWN  : this.target = new Point(t.x,   t.y+4); break;
+      case MOVE.LEFT  : this.target = new Point(t.x-4, t.y  ); break;
+      case MOVE.RIGHT : this.target = new Point(t.x+4, t.y  ); break;
 		}
-		const b = game.ghosts[0].tile;
-		const dx = this.target.x - b.x;
-		const dy = this.target.y - b.y;
-		this.target = new Point(this.target.x + dx, this.target.y + dy);
 		return this.target;
 	}
 
-	getPersonalPillReleaseCount(level) {
-		return level == 1 ? 30 : 0;
-	}
-	
 }

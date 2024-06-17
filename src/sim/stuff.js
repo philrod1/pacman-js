@@ -247,7 +247,7 @@ const pillPositions = [
     new Point(28, 26), new Point(28, 27), new Point(28, 29), new Point(28, 30)]
 ];
 
-// These patterns are inferred from the PacMan Dossier and
+/** These patterns are inferred from the PacMan Dossier and
 // readings taken from the emulator RAM.  Pairs of bits are
 // read each frame and the _cardinality_ of those bit pairs
 // is the number of pixels moved that frame.  After each
@@ -256,7 +256,8 @@ const pillPositions = [
 // object are the *percentages* from the table in the PacMan
 // Dossier.  This so-called percentage is the cardinality of
 // the full 32 bit pattern multiplied by 5.  So the 100%
-// speed equates to 20 pixels per 16 frames.  
+// speed equates to 20 pixels per 16 frames.
+*/
 const SPEED_PATTERNS = {
   40 : 0b00100010001000100010001000100010,
   45 : 0b00100100010010001001000100100010,
@@ -376,7 +377,6 @@ class TileDistance {
   }
 }
 
-
 class PriorityQueue {
   constructor(comparator = (a, b) => a.f - b.f) {
       this.items = [];
@@ -495,7 +495,7 @@ function aStarDistance(tile1, tile2, mazeID) {
 }
 
 function calculateDistances(graph, mazeID) {
-  const distances = new Map();
+  const distances = {};
   for (let x = 0; x < WIDTH; x++) {
     for (let y = 0; y < HEIGHT; y++) {
       const tile1 = graph[x][y];
@@ -517,7 +517,7 @@ function calculateDistances(graph, mazeID) {
                 }
               }
               if (dir) {
-                distances[tile1.x * HEIGHT + tile1.y][tile2.x * HEIGHT + tile2.y] = { "move": dir, "distance": d};
+                distances[tile1.x * HEIGHT + tile1.y][tile2.x * HEIGHT + tile2.y] = new MoveDistance(dir, d);
               }
             }
           }
@@ -528,7 +528,7 @@ function calculateDistances(graph, mazeID) {
   return distances;
 }
 
-function calculateMoveDistances(graph, mazeID) {
+function calculateAllDistances(graph, mazeID) {
   const distances = {};
   for (let x = 0; x < WIDTH; x++) {
     for (let y = 0; y < HEIGHT; y++) {
@@ -556,4 +556,5 @@ function calculateMoveDistances(graph, mazeID) {
   }
   return distances;
 }
+
 

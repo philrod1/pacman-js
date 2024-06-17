@@ -75,7 +75,7 @@ class Ghost {
 						this.target = this.door;
 					}
 					if (this.tileChanged) {
-						moves = game.maze.getAvailableMoves(this.tile);
+						moves = SimMaze.DATA.getAvailableMoves(this.tile, game.maze.mazeID);
 						moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
 						if (moves.length == 1) {
 							this.currentOrientation = moves[0];
@@ -142,7 +142,7 @@ class Ghost {
 						this.previousOrientation = this.previousOrientation.opposite;
 						this.reverse = false;
 					} else {
-						moves = game.maze.getAvailableMoves(this.tile);
+						moves = SimMaze.DATA.getAvailableMoves(this.tile, game.maze.mazeID);
 						if (moves == null) {
 							return this.previousOrientation;
 						}
@@ -151,14 +151,14 @@ class Ghost {
 							this.currentOrientation = moves[nextInt(moves.length)];
 						} else {
 							moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
-							let nextTile = game.maze.getNextTile(this.tile, this.currentOrientation);
+							let nextTile = SimMaze.DATA.getNextTile(this.tile, this.currentOrientation, game.maze.mazeID);
 							if (!nextTile) {
 								nextTile = this.tile;
 							}
 							if (this.wasFrightened || this.isDecisionPoint(this.pixel, nextTile, game.maze)) {
 								this.wasFrightened = false;
 								this.target = this.getTarget(game);
-								moves = game.maze.getAvailableMoves(nextTile);
+								moves = SimMaze.DATA.getAvailableMoves(nextTile, game.maze.mazeID);
 								moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
 								if (game.areGhostsRandom()) {
 									let i = nextInt(moves.length);
@@ -168,7 +168,7 @@ class Ghost {
 								}
 							}
 						}
-						if (this.isTileCentre(this.pixel) && game.maze.isDecisionTile(this.tile)) {
+						if (this.isTileCentre(this.pixel) && SimMaze.DATA.isDecisionTile(this.tile, game.maze.mazeID)) {
 							this.previousOrientation = this.currentOrientation;
 						}
 					}
@@ -209,8 +209,8 @@ class Ghost {
 	}
 
 	isDecisionPoint(pixel, tile, maze) {
-		if (maze.isLegalTilePoint(tile)) {
-			if (maze.isDecisionTile(tile)) {
+		if (MazeData.isLegalTilePoint(tile)) {
+			if (SimMaze.DATA.isDecisionTile(tile,  maze.mazeID)) {
 				switch (this.previousOrientation) {
 					case MOVE.UP: return pixel.y % 8 == 4;
 					case MOVE.DOWN: return pixel.y % 8 == 4;
@@ -249,7 +249,7 @@ class Ghost {
 
 	calculateMove(game, moves, tile, target) {
 		let m = this.previousOrientation;
-		const t = game.maze.getTile(tile);
+		const t = SimMaze.DATA.getTile(tile, game.maze.mazeID);
 		let dist = 10000000;
 		for (let move of [MOVE.UP, MOVE.LEFT, MOVE.DOWN, MOVE.RIGHT]) {
 			if (moves.includes(move)) {

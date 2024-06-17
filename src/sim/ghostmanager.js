@@ -22,8 +22,8 @@ class GhostManager {
         that.globalMode = this.globalMode;
         that.framesSincePillEaten = this.framesSincePillEaten;
         that.globalPillCount = this.globalPillCount;
-        that.globalPillLimits = new Array(...this.globalPillLimits);
-        that.ghostPillCounts = new Array(...this.ghostPillCounts);
+        that.globalPillLimits = this.globalPillLimits;
+        that.ghostPillCounts = [...this.ghostPillCounts];
         that.random = this.random;
         that.randomFrames = this.randomFrames;
         return that;

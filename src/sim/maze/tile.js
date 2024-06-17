@@ -59,6 +59,7 @@ class Tile {
     }
     if (val === 0x14) {
       this.value = 2;
+      this.junction = true;
       return true;
     }
     return false;

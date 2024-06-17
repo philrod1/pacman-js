@@ -178,24 +178,15 @@ class View {
     this.ctx.fillStyle = 'WHITE';
     const color = this.pillColors[maze.mazeID];
     tint(color);
-    for (let y = 0; y < 32; y++) {
-      for (let x = 0; x < 32; x++) {
-        let tile = maze.currentMaze[x][y];
-        if (tile) {
-          if (tile.value === 1) {
-            // image(this.pill, x * 8 * this.scale, y * 8 * this.scale, 8 * this.scale, 8 * this.scale);
-            this.ctx.beginPath();
-            this.ctx.arc((4 + x * 8) * this.scale, (4 + y * 8) * this.scale, 1 * this.scale, 0, 2 * Math.PI);
-            this.ctx.fill();
-          }
-          else if (tile.value === 2) {
-            // image(this.powerPill, x * 8 * this.scale, y * 8 * this.scale, 8 * this.scale, 8 * this.scale);
-            this.ctx.beginPath();
-            this.ctx.arc((4 + x * 8) * this.scale, (4 + y * 8) * this.scale, 3 * this.scale, 0, 2 * Math.PI);
-            this.ctx.fill();
-          }
-        }
-      }
+    for (const pill of maze.getPills()) {
+      this.ctx.beginPath();
+      this.ctx.arc((4 + pill.x * 8) * this.scale, (4 + pill.y * 8) * this.scale, 1 * this.scale, 0, 2 * Math.PI);
+      this.ctx.fill();
+    }
+    for (const pill of maze.getPowerPills()) {
+      this.ctx.beginPath();
+      this.ctx.arc((4 + pill.x * 8) * this.scale, (4 + pill.y * 8) * this.scale, 3 * this.scale, 0, 2 * Math.PI);
+      this.ctx.fill();
     }
     noTint();
   }

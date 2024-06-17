@@ -126,7 +126,7 @@ class Fruit {
 		if (this.active) {
 			return;
 		}
-		let maze = SimMaze.getMazeID(level);
+		let mazeID = SimMaze.getMazeID(level);
 		this.fruit = level - 1;
 		if (this.fruit > 6) {
 			const choice = nextInt(32);
@@ -134,9 +134,9 @@ class Fruit {
 		}
 		this.path = [];
 		const inPathId = nextInt(4);
-		this.path.push(...Fruit.IN_PATHS[maze][inPathId]);
+		this.path.push(...Fruit.IN_PATHS[mazeID][inPathId]);
 		this.path.push(...Fruit.HOME_PATH);
-		this.path.push(...Fruit.OUT_PATHS[maze][nextInt(4)]);
+		this.path.push(...Fruit.OUT_PATHS[mazeID][nextInt(4)]);
 		this.active = true;
 		this.tile = this.path.shift();
 		this.target = this.path.shift();
@@ -193,16 +193,17 @@ class Fruit {
 	}
 
 	calculateNextMove(game) {
-		let moves = game.maze.getAvailableMoves(this.tile);
+    const mazeID = game.maze.mazeID;
+		let moves = SimMaze.DATA.getAvailableMoves(this.tile, mazeID);
 		if (moves == null) {
 			return this.previousOrientation;
 		}
-		if (game.maze.isDecisionTile(this.tile)) {
-			moves = game.maze.getAvailableMoves(this.tile);
+		if (SimMaze.DATA.isDecisionTile(this.tile, mazeID)) {
+			moves = SimMaze.DATA.getAvailableMoves(this.tile, mazeID);
 			moves = moves.filter((m) => m.ordinal !== this.previousOrientation.opposite.ordinal);
-			this.currentOrientation = game.maze.getMoveTowards2(this.tile, this.target, moves);
+			this.currentOrientation = SimMaze.DATA.getMoveTowards2(this.tile, this.target, moves, mazeID);
 		}
-		if (this.isTileCentre(this.pixel) && game.maze.isDecisionTile(this.tile)) {
+		if (this.isTileCentre(this.pixel) && SimMaze.DATA.isDecisionTile(this.tile, mazeID)) {
 			this.previousOrientation = this.currentOrientation;
 		}
 		return this.previousOrientation;
