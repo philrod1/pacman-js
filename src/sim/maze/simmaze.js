@@ -1,12 +1,13 @@
 class SimMaze {
   
   static DATA = new MazeData();
+  static PILL_COUNTS = [224, 244, 238, 234];
 
   constructor() {
     this.mazeID = 0;
     this.level = 1;
-    this.pills = [];
-    this.powerPills = [];
+    this.pills = null;
+    this.powerPills = null;
     this.pillCount = 0;
   }
 
@@ -15,8 +16,8 @@ class SimMaze {
     that.mazeID = this.mazeID;
     that.pillCount = this.pillCount;
     that.level = this.level;
-    that.pills = [...this.pills];
-    that.powerPills = [...this.powerPills];
+    that.pills = new Map(this.pills);
+    that.powerPills = new Map(this.powerPills);
     return that;
   }
 
@@ -32,22 +33,15 @@ class SimMaze {
     this.level = level;
     this.mazeID = SimMaze.getMazeID(level);
     SimMaze.DATA.setMaze(this.mazeID);
-    this.pills = [];
+    this.pills = new Map();
     for (const p of pillPositions[this.mazeID]) {
-      this.pills[p.x * 32 + p.y] = true;
+      this.pills.set((p.x << 5) + p.y, true);
     }
-    this.powerPills = [];
+    this.powerPills = new Map();
     for (const p of powerPillPositions[this.mazeID]) {
-      this.powerPills[p.x * 32 + p.y] = true;
+      this.powerPills.set((p.x << 5) + p.y, true);
     }
-    this.pillCount = this.pills.flatMap( (v, i) => v ? i : null ).filter( x => x ).length + 4;
-    // switch (this.mazeID) {
-    //   case 0: this.pillCount = 220; break;
-    //   case 1: this.pillCount = 240; break;
-    //   case 2: this.pillCount = 238; break;
-    //   case 3: this.pillCount = 234; break;
-    //   default: this.pillCount = 0;
-    // }
+    this.pillCount = SimMaze.PILL_COUNTS[this.mazeID];
   }
 
   static getMazeID(level) {
@@ -60,9 +54,9 @@ class SimMaze {
   }
 
   pillEaten(pacman) {
-    const index = pacman.x * 32 + pacman.y;
-    if (this.pills[index]) {
-      this.pills[index] = false;
+    const index = (pacman.x << 5) + pacman.y;
+    if (this.pills.has(index)) {
+      this.pills.delete(index);
       this.pillCount--;
       return true;
     }
@@ -70,9 +64,9 @@ class SimMaze {
   }
 
   powerPillEaten(pacman) {
-    const index = pacman.x * 32 + pacman.y;
-    if (this.powerPills[index]) {
-      this.powerPills[index] = false;
+    const index = (pacman.x << 5) + pacman.y;
+    if (this.powerPills.has(index)) {
+      this.powerPills.delete(index);
       this.pillCount--;
       return true;
     }
@@ -80,18 +74,11 @@ class SimMaze {
   }
 
   getPills() {
-    // const pills = [];
-    // for (let [i, v] of this.pills.entries()) {
-    //   if (v) {
-    //     pills.push(new Point(Math.floor(i/32), i%32));
-    //   }
-    // }
-    // return pills;
-    return this.pills.flatMap( (v, i) => v ? i : null ).filter( x => x ).map( p => new Point(Math.floor(p/32), p%32) );
+    return this.pills.keys().map( p => new Point(p >> 5, p & 0x1F) );
 	}
 
   getPowerPills() {
-		return this.powerPills.flatMap( (v, i) => v ? i : null ).filter( x => x ).map( p => new Point(Math.floor(p/32), p%32) );
+    return this.powerPills.keys().map( p => new Point(p >> 5, p & 0x1F) );
 	}
 
   getCurrentMazeID() {

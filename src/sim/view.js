@@ -10,8 +10,6 @@ class View {
     this.pacmanSprites = loadImage('res/ms_pacman_sprites.png');
     this.lifeImg = loadImage('res/life.png');
     this.font = loadImage('res/full_font.png');
-    this.pill = loadImage('res/pill.png');
-    this.powerPill = loadImage('res/power_pill.png');
     this.fruitSprites = loadImage('res/fruit_sprites.png');
     this.fruitScores = loadImage('res/fruit_scores.png');
     this.mazeImages = [
@@ -175,9 +173,8 @@ class View {
 
   drawPills() {
     const maze = this.game.maze;
-    this.ctx.fillStyle = 'WHITE';
-    const color = this.pillColors[maze.mazeID];
-    tint(color);
+    this.ctx.fillStyle = this.pillColors[maze.mazeID];
+    // tint(color);
     for (const pill of maze.getPills()) {
       this.ctx.beginPath();
       this.ctx.arc((4 + pill.x * 8) * this.scale, (4 + pill.y * 8) * this.scale, 1 * this.scale, 0, 2 * Math.PI);
@@ -188,7 +185,15 @@ class View {
       this.ctx.arc((4 + pill.x * 8) * this.scale, (4 + pill.y * 8) * this.scale, 3 * this.scale, 0, 2 * Math.PI);
       this.ctx.fill();
     }
-    noTint();
+
+    // for (let x = 0 ; x < 32 ; x++) {
+    //   for (let y = 0 ; y < 32 ; y++) {
+    //     if (SimMaze.DATA.mazes[maze.mazeID][x][y] && SimMaze.DATA.mazes[maze.mazeID][x][y].junction) {
+    //       this.ctx.fillRect(x * 8 * this.scale, y * 8 * this.scale, 8 * this.scale, 8 * this.scale);
+    //     }
+    //   }
+    // }
+    // noTint();
   }
 
   drawMaze() {

@@ -1,5 +1,12 @@
 class MazeData {
 
+  static FAKE_JUNTIONS = [
+    [new Point(4,2), new Point(11,2), new Point(20,2), new Point(27,2), new Point(3,30), new Point(28,30)],
+    [],
+    [],
+    []
+  ]
+
   static SLOW_TILES = [
     new Set([2, 3, 4, 27, 28, 29].flatMap(x => [9, 18].map(y => new Point(x, y)))),
     new Set([...Array.from({ length: 7 }, (_, i) => new Point(2 + i, 2)),
@@ -17,10 +24,10 @@ class MazeData {
       calculateAllDistances(this.mazes[2], 2),
       calculateAllDistances(this.mazes[3], 3),
     ];
-    this.initMaze(0);
-    this.initMaze(1);
-    this.initMaze(2);
-    this.initMaze(3);
+    // this.initMaze(0);
+    // this.initMaze(1);
+    // this.initMaze(2);
+    // this.initMaze(3);
   }
 
   setMaze(mazeID) {
@@ -28,18 +35,18 @@ class MazeData {
     this.currentMaze = this.mazes[mazeID];
   }
 
-  initMaze(mazeID) {
-    const mazeData = [maze1, maze2, maze3, maze4];
-    const ram = mazeData[mazeID];
-    const graph = this.mazes[mazeID];
-    for (let x = 0; x < 32; x++) {
-      for (let y = 0; y < 32; y++) {
-        if (ram[x][y] === 0x10 || ram[x][y] === 0x14) {
-          graph[x][y].setValue(ram[x][y]);
-        }
-      }
-    }
-  }
+  // initMaze(mazeID) {
+  //   const mazeData = [maze1, maze2, maze3, maze4];
+  //   const ram = mazeData[mazeID];
+  //   const graph = this.mazes[mazeID];
+  //   // for (let x = 0; x < 32; x++) {
+  //   //   for (let y = 0; y < 32; y++) {
+  //   //     if (ram[x][y] === 0x10 || ram[x][y] === 0x14) {
+  //   //       graph[x][y].setValue(ram[x][y]);
+  //   //     }
+  //   //   }
+  //   // }
+  // }
 
   buildGraphs() {
     const mazeData = [maze1, maze2, maze3, maze4];
@@ -63,6 +70,10 @@ class MazeData {
           graph[x][y] = null;
         }
       }
+    }
+
+    for (const tile of MazeData.FAKE_JUNTIONS[mazeID]) {
+      graph[tile.x][tile.y].junction = true;
     }
 
     for (const tile of tiles) {
@@ -143,7 +154,7 @@ class MazeData {
   }
 
   getAllDistances(p1, p2, mazeID) {
-    return this.allDistances[mazeID][p1.x * 32 + p1.y][p2.x * 32 + p2.y];
+    return this.allDistances[mazeID][(p1.x << 5) + p1.y][(p2.x << 5) + p2.y];
   }
 
   getNextTile(point, move, mazeID) {

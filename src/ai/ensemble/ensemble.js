@@ -74,17 +74,18 @@ class EnsembleAI {
 
 class GhostDodger {
   getPreferences(game) {
-    if(game.pacman.energised) {
-			return [1,1,1,1];
-		}
+    // if(game.pacman.energised) {
+		// 	return [1,1,1,1];
+		// }
 		const stop = Date.now() + 12;
 		const prefs = [0,0,0,0];
     let simGame;
     let dead = false;
+    simGame = game.copy();
+    const data = new GameData(game);
 
     for (const move of SimMaze.DATA.getAvailableMoves(game.pacman.tile, game.maze.mazeID)) {
       dead = false;
-      simGame = game.copy();
       simGame.pacman.setNextMove(move);
       let target = SimMaze.DATA.getNextJunctionPoint(simGame.pacman.tile, move, simGame.maze.mazeID);
       while (!simGame.pacman.tile.equals(target)) {
@@ -94,24 +95,19 @@ class GhostDodger {
           break;
         }
       }
+      const data2 = new GameData(simGame);
       if (dead) {
-        // console.log("DEAD", move);
         prefs[move.ordinal] = 0;
       } else {
-        prefs[move.ordinal] = this.allPathsAverage(simGame, 0, 4);
+        // prefs[move.ordinal] = this.allPathsAverage(simGame, 0, 4);
+        for (let i = 0 ; i < 10 ; i++) {
+          data2.restore(simGame);
+          prefs[move.ordinal] += this.randomWalk(simGame, 0, 6);
+        }
       }
-      
-      // prefs[move.ordinal] = 0;
-      // for (let i = 0 ; i < 5 ; i++) {
-      //   prefs[move.ordinal] += this.randomWalk(simGame.copy(), 0, 8);
-      // }
+      data.restore(simGame);
     }
-      
-		// for (let i = 0 ; i < 4 ; i++) {
-    //   prefs[i] = Math.min(prefs[i], 20);
-		// 	prefs[i] /= 20;
-		// }
-    
+
 		return prefs;
   }
 
@@ -121,41 +117,41 @@ class GhostDodger {
     }
     const mazeID = game.maze.mazeID;
     let value = 0;
+    const data = new GameData(game);
     const moves = SimMaze.DATA.getAvailableMoves(game.pacman.tile, mazeID);
     for (let move of moves) {
-      let copy = game.copy();
-      copy.pacman.setNextMove(move);
-      let target = SimMaze.DATA.getNextJunctionPoint(copy.pacman.tile, move, mazeID);
-      while (!copy.pacman.tile.equals(target)) {
-        copy.pacman.setNextMove(SimMaze.DATA.getMoveTowards(copy.pacman.tile, target, mazeID));
-        let result = copy.step();
+      data.restore(game);
+      game.pacman.setNextMove(move);
+      let target = SimMaze.DATA.getNextJunctionPoint(game.pacman.tile, move, mazeID);
+      while (!game.pacman.tile.equals(target)) {
+        game.pacman.setNextMove(SimMaze.DATA.getMoveTowards(game.pacman.tile, target, mazeID));
+        let result = game.step();
         if (!result) {
           return depth;
         }
       }
-      value += this.allPathsAverage(copy, depth+1, maxDepth);
+      value += this.allPathsAverage(game, depth+1, maxDepth);
     }
     return value / (moves.length * maxDepth);
   }
 
-  // randomWalk(game, depth, maxDepth) {
-  //   if (depth === maxDepth) {
-  //     return depth;
-  //   }
-  //   const moves = game.maze.getAvailableMoves(game.pacman.tile);
-  //   const move = moves[nextInt(moves.length)];
-  //   game.pacman.setNextMove(move);
-  //   let target = game.maze.getNextDecisionPoint(game.pacman.tile, move);
-  //   // console.log(game.pacman.tile, target);
-  //   while (!game.pacman.tile.equals(target)) {
-  //     let result = game.step();
-  //     // console.log(result);
-  //     if (!result) {
-  //       return 0;
-  //     }
-  //   }
-  //   return this.randomWalk(game, depth+1, maxDepth);
-  // }
+  randomWalk(game, depth, maxDepth) {
+    if (depth === maxDepth) {
+      return depth;
+    }
+    const mazeID = game.maze.mazeID;
+    const moves = SimMaze.DATA.getAvailableMoves(game.pacman.tile, mazeID);
+    const move = moves[nextInt(moves.length)];
+    game.pacman.setNextMove(move);
+    let target = SimMaze.DATA.getNextDecisionPoint(game.pacman.tile, move, mazeID);
+    while (!game.pacman.tile.equals(target)) {
+      let result = game.step();
+      if (!result) {
+        return 0;
+      }
+    }
+    return this.randomWalk(game, depth+1, maxDepth);
+  }
 }
 
 class PillMuncher {
@@ -192,6 +188,20 @@ class FruitMuncher {
 
 class GhostChaser {
   getPreferences(game) {
-    return [0,0,0,0];
+    if (!game.pacman.energised) {
+      return [0,0,0,0];
+    }
+    const results = [0,0,0,0];
+    const mazeID = game.maze.mazeID;
+    const moves = SimMaze.DATA.getAvailableMoves(game.pacman.tile, mazeID);
+    for (const ghost of game.ghostManager.ghosts) {
+      if (ghost.state == 4 && ghost.frightened) {
+        const distances = SimMaze.DATA.getAllDistances(game.pacman.tile, ghost.tile, mazeID);
+        for (const move of moves) {
+          results[move.ordinal] += 1 / distances[move.ordinal];
+        }
+      }
+    }
+    return results;
   }
 }
